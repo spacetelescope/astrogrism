@@ -1,6 +1,6 @@
 import pytest
 
-from packagename.example_mod import primes, do_primes, main
+from astrogrism.example_mod import primes, do_primes, main
 
 
 def test_primes():

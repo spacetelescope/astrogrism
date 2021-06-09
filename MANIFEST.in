@@ -6,7 +6,7 @@ include CITATION
 include setup.cfg
 include pyproject.toml
 
-recursive-include packagename *.pyx *.c *.pxd
+recursive-include astrogrism *.pyx *.c *.pxd
 recursive-include docs *
 
 prune build
