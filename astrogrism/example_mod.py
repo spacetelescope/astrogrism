@@ -21,7 +21,7 @@ def primes(imax):
 
     Examples
     --------
-    >>> from packagename import primes
+    >>> from astrogrism import primes
     >>> primes(2)
     [2, 3]
 
@@ -77,7 +77,7 @@ def do_primes(n, usecython=False):
 
     Examples
     --------
-    >>> from packagename import do_primes
+    >>> from astrogrism import do_primes
     >>> do_primes(2)
     [2, 3]
 
