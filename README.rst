@@ -1,29 +1,7 @@
-STScI Package Template
+Astrogrism
 ======================
 
-.. image:: https://readthedocs.org/projects/stsci-package-template/badge/?version=latest
-    :target: https://stsci-package-template.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
-
-.. image:: https://github.com/spacetelescope/stsci-package-template/workflows/CI/badge.svg
-    :target: https://github.com/spacetelescope/stsci-package-template/actions
-    :alt: GitHub Actions CI Status
-
-.. image:: https://codecov.io/gh/spacetelescope/stsci-package-template/branch/main/graph/badge.svg
-    :target: https://codecov.io/gh/spacetelescope/stsci-package-template
-    :alt: Coverage Status
-
-.. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
-    :target: http://www.astropy.org
-    :alt: Powered by Astropy Badge
-
-To use this package template, see instructions for
-`GitHub's creating a repository from a template <https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template>`_.
-
-After you have created your new repository from this template,
-please go through all the files in your new repository carefully
-and customize it as you see fit. Please also refer to
-`STScI style guides <https://github.com/spacetelescope/style-guides>`_.
+Astrogrism is a data analysis package for analyzing astronomical grism data for Multi-Object Spectroscopy (MOS) observations being built from the ground up. The project's goal is to bring together Hubble and James Webb Space Telescope grism reduction pipelines and analysis functions into a unified ecosystem.
 
 
 License
