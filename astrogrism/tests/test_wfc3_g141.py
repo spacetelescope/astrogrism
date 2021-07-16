@@ -1,6 +1,6 @@
 import pytest
 
-from grism_observation import GrismObs
+from astrogrism import GrismObs
 import grismconf
 from astropy.wcs import WCS
 
