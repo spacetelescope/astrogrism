@@ -7,3 +7,4 @@ except ImportError:
 
 # Expose subpackage API at package level.
 from .example_mod import *  # noqa
+from.grism_observation import GrismObs
