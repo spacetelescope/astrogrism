@@ -26,23 +26,17 @@ class GrismObs():
     def __init__(self, grism_image, direct_image=None, telescope=None, instrument=None,
                  detector=None, filter=None):
 
-        # Read grism image file if string input
-        if isinstance(grism_image, str):
-            self.grism_image = fits.open(grism_image)
-        elif isinstance(grism_image, fits.HDUList):
-            self.grism_image = grism_image
-        else:
-            raise TypeError("grism_image must be either a string filepath or FITS HDUList")
+        for image in ('grism_image', 'direct_image'):
+            image_obj = locals().get(image)
+            if isinstance(image_obj, str):
+                setattr(self, image, fits.open(pathlib.Path(image_obj)))
+            elif isinstance(image_obj, (fits.HDUList, type(None))):
+                setattr(self, image, image_obj)
+            else:
+                raise TypeError(f"Unrecognized type: {image} must be filepath or FITS HDUList ")
 
-        # Read direct image file if string input
-        if direct_image is None:
-            self.direct_image = None
-        if isinstance(direct_image, str):
-            self.direct_image = fits.open(direct_image)
-        elif isinstance(direct_image, fits.HDUList) or direct_image is None:
-            self.direct_image = direct_image
-        else:
-            raise TypeError("direct_image must be either a string filepath or FITS HDUList")
+        if not grism_image:
+            raise TypeError("grism_image is a required argument")
 
         # Parse grism image file header for meta info
         self.grism_header = self.grism_image["PRIMARY"].header
@@ -50,19 +44,13 @@ class GrismObs():
         # Attempt to retrieve any information missing from the header (e.g. SIP)
         # Should probably make these properties instead.
         if telescope is None:
-            self.telescope = self.grism_header["TELESCOP"]
-        else:
-            self.telescope = telescope
+            self.telescope = self.grism_header.get("TELESCOP")
 
         if instrument is None:
-            self.instrument = self.grism_header["INSTRUME"]
-        else:
-            self.instrument = instrument
+            self.instrument = self.grism_header.get("INSTRUME")
 
         if filter is None:
-            self.filter = self.grism_header["FILTER"]
-        else:
-            self.filter = filter
+            self.filter = self.grism_header.get("FILTER")
 
 
         # Build GWCS geometric transform pipeline
