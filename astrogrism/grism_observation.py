@@ -35,6 +35,8 @@ class GrismObs():
             else:
                 raise TypeError(f"Unrecognized type: {image} must be filepath or FITS HDUList ")
 
+        # For now, the grism_image is a required argument. Eventually we want to
+        # break that, but for now, raise an error
         if not grism_image:
             raise TypeError("grism_image is a required argument")
 
@@ -136,6 +138,7 @@ class GrismObs():
         cdmat = np.array([[sip_hdus[1].header['CD1_1'], sip_hdus[1].header['CD1_2']],
                   [sip_hdus[1].header['CD2_1'], sip_hdus[1].header['CD2_2']]])
 
+        # Gather Forward SIP Model Polynomials
         a_polycoef = {}
         for key in acoef:
             a_polycoef['c' + key.split('A_')[1]] = acoef[key]
@@ -144,6 +147,7 @@ class GrismObs():
         for key in bcoef:
             b_polycoef['c' + key.split('B_')[1]] = bcoef[key]
 
+        # Gather Inverse SIP Model Polynomials
         ap_polycoef = {}
         for key in apcoef:
             ap_polycoef['c' + key.split('AP_')[1]] = apcoef[key]
@@ -152,6 +156,7 @@ class GrismObs():
         for key in bpcoef:
              bp_polycoef['c' + key.split('BP_')[1]] = bpcoef[key]
 
+        # Construct models
         a_poly = models.Polynomial2D(a_order, **a_polycoef)
         b_poly = models.Polynomial2D(b_order, **b_polycoef)
         ap_poly = models.Polynomial2D(ap_order, **ap_polycoef)
