@@ -95,12 +95,12 @@ class GrismObs():
         dispy = specwcs['dispy']
         invdispl = specwcs['invdispl']
         invdispx = specwcs['invdispx']
-        invdispy = specwcs['invdispy']
+        # invdispy = specwcs['invdispy']
         orders = specwcs['order']
 
         gdetector = cf.Frame2D(name='grism_detector',
                                axes_order=(0, 1),
-                             unit=(u.pix, u.pix))
+                               unit=(u.pix, u.pix))
         det2det = WFC3IRForwardGrismDispersion(orders,
                                                lmodels=displ,
                                                xmodels=invdispx,
@@ -135,8 +135,10 @@ class GrismObs():
         crval = [self.grism_image[1].header['CRVAL1'],
                  self.grism_image[1].header['CRVAL2']]
 
-        cdmat = np.array([[sip_hdus[1].header['CD1_1'], sip_hdus[1].header['CD1_2']],
-                [sip_hdus[1].header['CD2_1'], sip_hdus[1].header['CD2_2']]])
+        cdmat = np.array([[sip_hdus[1].header['CD1_1'],
+                           sip_hdus[1].header['CD1_2']],
+                          [sip_hdus[1].header['CD2_1'],
+                           sip_hdus[1].header['CD2_2']]])
 
         # Gather Forward SIP Model Polynomials
         a_polycoef = {}
@@ -163,18 +165,18 @@ class GrismObs():
         bp_poly = models.Polynomial2D(bp_order, **bp_polycoef)
 
         # See SIP definition paper for definition of u, v, f, g
-        SIP_forward = (models.Shift(-(crpix[0]-1)) & models.Shift(-(crpix[1]-1)) | # Calculate u and v
-                       models.Mapping((0, 1, 0, 1, 0, 1)) | a_poly & b_poly & models.Identity(2) |
+        SIP_forward = (models.Shift(-(crpix[0]-1)) & models.Shift(-(crpix[1]-1)) | # Calculate u and v  # noqa
+                       models.Mapping((0, 1, 0, 1, 0, 1)) | a_poly & b_poly & models.Identity(2) | # noqa
                        models.Mapping((0, 2, 1, 3)) |
                        models.math.AddUfunc() & models.math.AddUfunc() |
                        models.AffineTransformation2D(matrix=cdmat) |
                        models.Pix2Sky_TAN() |
                        models.RotateNative2Celestial(crval[0], crval[1], 180))
 
-        SIP_backward = (models.RotateCelestial2Native(crval[0], crval[1], 180) |
+        SIP_backward = (models.RotateCelestial2Native(crval[0], crval[1], 180) | # noqa
                         models.Sky2Pix_TAN() |
                         models.AffineTransformation2D(matrix=cdmat).inverse |
-                        models.Mapping((0, 1, 0, 1, 0, 1)) | ap_poly & bp_poly & models.Identity(2) |
+                        models.Mapping((0, 1, 0, 1, 0, 1)) | ap_poly & bp_poly & models.Identity(2) | # noqa
                         models.Mapping((0, 2, 1, 3)) |
                         models.math.AddUfunc() & models.math.AddUfunc() |
                         models.Shift((crpix[0]-1)) & models.Shift((crpix[1]-1))

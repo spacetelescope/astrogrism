@@ -20,7 +20,7 @@ class DISPXY_Model(Model):
         offset = self.offset
         coeffs = np.array([1, x, y, x**2, x*y, y**2])
         if self.inv:
-            return (t + offset - np.dot(coeffs, e[0, :])) / np.dot(coeffs, e[1, :])
+            return (t + offset - np.dot(coeffs, e[0, :])) / np.dot(coeffs, e[1, :]) # noqa
         else:
             return np.dot(coeffs, e[0, :]) + t*np.dot(coeffs, e[1, :]) - offset
 
