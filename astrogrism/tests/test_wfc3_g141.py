@@ -40,8 +40,8 @@ def test_wfc3_g141_astropywcs():
     astrogrism_ra, astrogrism_dec = image2world(xx, yy, 0, 0)[:2]
 
     # Compare results
-    np.testing.assert_allclose(astrogrism_ra, astropywcs_ra, atol=1e-02)
-    np.testing.assert_allclose(astrogrism_dec, astropywcs_dec, atol=1e-02)
+    np.testing.assert_allclose(astrogrism_ra, astropywcs_ra, atol=5e-02)
+    np.testing.assert_allclose(astrogrism_dec, astropywcs_dec, atol=5e-02)
 
 
 def test_wfc3_g141_grismconf():
@@ -84,8 +84,8 @@ def test_wfc3_g141_grismconf():
                                               grismconf_wavelengths)
 
     # Compare results
-    np.testing.assert_allclose(astrogrism_x, grismconf_x, atol=1e-02)
-    np.testing.assert_allclose(astrogrism_y, grismconf_y, atol=1e-02)
+    np.testing.assert_allclose(astrogrism_x, grismconf_x, atol=5e-02)
+    np.testing.assert_allclose(astrogrism_y, grismconf_y, atol=5e-02)
 
 
 def test_wfc3_g141_grizli():
@@ -99,8 +99,8 @@ def test_wfc3_g141_grizli():
     astrogrism_x, astrogrism_y = _image2grism(500, 500, grizli_wavelengths)
 
     # Compare results
-    np.testing.assert_allclose(astrogrism_x, grizli_x, atol=1e-02)
-    np.testing.assert_allclose(astrogrism_y, grizli_y, atol=1e-02)
+    np.testing.assert_allclose(astrogrism_x, grizli_x, atol=5e-02)
+    np.testing.assert_allclose(astrogrism_y, grizli_y, atol=5e-02)
 
 
 def _image2grism(x_center, y_center, wavelengths):
