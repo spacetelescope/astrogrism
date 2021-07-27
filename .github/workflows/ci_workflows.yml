@@ -22,11 +22,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Code style checks
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: codestyle
-
           - name: PEP 517
             os: ubuntu-latest
             python: 3.x
@@ -61,6 +56,11 @@ jobs:
             os: ubuntu-latest
             python: 3.9
             toxenv: py39-test-devdeps
+
+          - name: Code style checks
+            os: ubuntu-latest
+            python: 3.x
+            toxenv: codestyle
 
     steps:
     - name: Checkout code
