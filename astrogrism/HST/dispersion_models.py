@@ -1,7 +1,7 @@
 import numpy as np
-from astropy.modeling.models import custom_model
-from astropy.modeling import Model, Parameter
+from astropy.modeling import Model
 from asdf.extension import Converter
+
 
 class DISPXY_Model(Model):
     n_inputs = 3
@@ -20,9 +20,10 @@ class DISPXY_Model(Model):
         offset = self.offset
         coeffs = np.array([1, x, y, x**2, x*y, y**2])
         if self.inv:
-            return (t + offset - np.dot(coeffs, e[0,:]))/np.dot(coeffs, e[1,:])
+            return (t + offset - np.dot(coeffs, e[0, :])) / np.dot(coeffs, e[1, :])
         else:
-            return np.dot(coeffs, e[0,:]) + t*np.dot(coeffs, e[1,:]) - offset
+            return np.dot(coeffs, e[0, :]) + t*np.dot(coeffs, e[1, :]) - offset
+
 
 class DISPXY_ModelConverter(Converter):
     tags = ["tag:stsci.edu:grismstuff/dispxy_model-*"]
@@ -37,8 +38,9 @@ class DISPXY_ModelConverter(Converter):
         inverse_flag = node['inverse_flag']
         return DISPXY_Model(ematrix, inverse_flag)
 
+
 class DISPXY_Extension():
     extension_uri = "asdf://stsci.edu/grismstuff/extensions/extension-1.0"
     converters = [DISPXY_ModelConverter()]
     tags = ["tag:stsci.edu:grismstuff/dispxy_model-1.0.0"]
-    #tags = ["asdf://stsci.edu/grismstuff/tags/dispxy_model-1.0"]
+    # tags = ["asdf://stsci.edu/grismstuff/tags/dispxy_model-1.0"]
