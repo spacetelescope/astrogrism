@@ -1,11 +1,7 @@
-import math
-from collections import namedtuple
 import numpy as np
 from astropy.modeling.core import Model
-from astropy.modeling.parameters import Parameter, InputParameterError
 from astropy.modeling.models import (Rotation2D, Identity, Mapping, Tabular1D, Const1D)
 from astropy.modeling.models import math as astmath
-from astropy.utils import isiterable
 
 
 class WFC3IRForwardGrismDispersion(Model):
@@ -56,7 +52,7 @@ class WFC3IRForwardGrismDispersion(Model):
         if name is None:
             name = 'wfc3ir_forward_row_grism_dispersion'
         super(WFC3IRForwardGrismDispersion, self).__init__(name=name,
-                                                              meta=meta)
+                                                           meta=meta)
         # starts with the backwards pixel and calculates the forward pixel
         self.inputs = ("x", "y", "x0", "y0", "order")
         self.outputs = ("x", "y", "wavelength", "order")
@@ -96,27 +92,14 @@ class WFC3IRForwardGrismDispersion(Model):
         except KeyError:
             raise ValueError("Specified order is not available")
 
-        # The next two lines are to get around the fact that
-        # modeling.standard_broadcasting=False does not work.
-        #x00 = x0.flatten()[0]
-        #y00 = y0.flatten()[0]
-
-        t = np.linspace(0, 1, 10)  #sample t
+        t = np.linspace(0, 1, 10)
 
         xmodel = self.xmodels[iorder]
         ymodel = self.ymodels[iorder]
         lmodel = self.lmodels[iorder]
 
-        try:
-            dx = xmodel.evaluate(x0, y0, t)
-        except:
-            print("Error in x model evaluation")
-            raise
-        try:
-            dy = ymodel.evaluate(x0, y0, t)
-        except:
-            print ("Error in y model evaluation")
-            raise
+        dx = xmodel.evaluate(x0, y0, t)
+        dy = ymodel.evaluate(x0, y0, t)
 
         if self.theta != 0.0:
             rotate = Rotation2D(self.theta)
@@ -130,13 +113,12 @@ class WFC3IRForwardGrismDispersion(Model):
         # Need to build this compound model differently depending on lmodel inputs
         if lmodel.n_inputs == 1:
             wavelength = dxr | tab | lmodel
-            model = Mapping((2, 3, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) & 
+            model = Mapping((2, 3, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
                                                 wavelength & Const1D(order))
         elif lmodel.n_inputs == 3:
             wavelength = Identity(2) & dxr | Identity(2) & tab | lmodel
-            model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) & 
+            model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
                                                       wavelength & Const1D(order))
-
 
         return model(x, y, x0, y0, order)
 
@@ -235,43 +217,29 @@ class WFC3IRBackwardGrismDispersion(Model):
         except KeyError:
             raise ValueError("Specified order is not available")
 
-        try:
-            if self.interpolate_t:
-                # If the displ coefficients are too complex to invert, have to interpolate t
-                t = np.linspace(-1, 2, 40)  #sample t
-                if self.lmodels[iorder].n_inputs == 1:
-                    l = self.lmodels[iorder].evaluate(t)
-                elif self.lmodels[iorder].n_inputs == 3:
-                    l = self.lmodels[iorder].evaluate(x, y, t)
-                so = np.argsort(l)
-                tab = Tabular1D(l[so], t[so], bounds_error=False, fill_value=None)
-                t = tab(wavelength)
-            else:
-                if self.lmodels[iorder].n_inputs == 1:
-                    t = self.lmodels[iorder](wavelength)
-                elif self.lmodels[iorder].n_inputs == 3:
-                    print("In 3 input section")
-                    t = self.lmodels[iorder](x, y, wavelength)
-        except:
-            print("Error in lmodel evaluation")
-            print("N inputs: {}".format(self.lmodels[iorder].n_inputs))
-            raise
+        if self.interpolate_t:
+            # If the displ coefficients are too complex to invert, have to interpolate t
+            t = np.linspace(-1, 2, 40)
+            if self.lmodels[iorder].n_inputs == 1:
+                l = self.lmodels[iorder].evaluate(t)
+            elif self.lmodels[iorder].n_inputs == 3:
+                l = self.lmodels[iorder].evaluate(x, y, t)
+            so = np.argsort(l)
+            tab = Tabular1D(l[so], t[so], bounds_error=False, fill_value=None)
+            t = tab(wavelength)
+        else:
+            if self.lmodels[iorder].n_inputs == 1:
+                t = self.lmodels[iorder](wavelength)
+            elif self.lmodels[iorder].n_inputs == 3:
+                t = self.lmodels[iorder](x, y, wavelength)
 
         xmodel = self.xmodels[iorder]
         ymodel = self.ymodels[iorder]
 
-        try:
-            dx = xmodel.evaluate(x, y, t)
-        except:
-            print("Error in xmodel")
-            raise
-        try:
-            dy = ymodel.evaluate(x, y, t)
-        except:
-            print("Error in ymodel")
-            raise
+        dx = xmodel.evaluate(x, y, t)
+        dy = ymodel.evaluate(x, y, t)
 
-        ## rotate by theta
+        # rotate by theta
         if self.theta != 0.0:
             rotate = Rotation2D(self.theta)
             dx, dy = rotate(dx, dy)

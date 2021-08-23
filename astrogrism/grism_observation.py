@@ -1,6 +1,3 @@
-## Base class for Astrogrism
-from importlib.resources import path as resource_path
-
 import asdf
 from astropy.io import fits
 from astropy.modeling import models
@@ -13,9 +10,8 @@ import pathlib
 from HST.transform_models import WFC3IRForwardGrismDispersion, WFC3IRBackwardGrismDispersion
 from HST.dispersion_models import DISPXY_Extension
 
-# Will remove this hardcoded path once I have this packaged up for use with importlib
-#pkg_dir = pathlib.Path('/Users/rosteen/projects/astrogrism_sandbox')
 pkg_dir = pathlib.Path(__file__).parent.absolute()
+
 
 class GrismObs():
     """
@@ -64,7 +60,6 @@ class GrismObs():
         else:
             self.filter = filter
 
-
         # Build GWCS geometric transform pipeline
         print(self.instrument)
         if self.filter == "G280":
@@ -91,7 +86,6 @@ class GrismObs():
         asdf.get_config().add_extension(DISPXY_Extension())
 
         # Get paths to premade configuration files
-        #config_dir = "{}/config/{}/".format(pkg_dir, self.telescope)
         config_dir = pkg_dir / 'config' / self.telescope
 
         # Account for additional specifications needed for WFC3 instrument and filter
@@ -121,16 +115,11 @@ class GrismObs():
         except KeyError:
             invdispl = None
         invdispx = specwcs['invdispx']
-        try:
-            invdispy = specwcs['invdispy']
-        except KeyError:
-            # Value of None doesn't seem to save in asdf, set it here
-            invdispy = None
         orders = specwcs['order']
 
         gdetector = cf.Frame2D(name='grism_detector',
-                       axes_order=(0, 1),
-                       unit=(u.pix, u.pix))
+                               axes_order=(0, 1),
+                               unit=(u.pix, u.pix))
         det2det = WFC3IRForwardGrismDispersion(orders,
                                                lmodels=displ,
                                                xmodels=invdispx,
@@ -177,17 +166,15 @@ class GrismObs():
         except ValueError:
             raise
 
-        #crpix = [sip_hdus[1].header['CRPIX1'], sip_hdus[1].header['CRPIX2']]
         crpix = [self.grism_image[1].header['CRPIX1'], self.grism_image[1].header['CRPIX2']]
 
         crval = [self.grism_image[1].header['CRVAL1'],
                  self.grism_image[1].header['CRVAL2']]
 
-        #cdmat = np.array([[sip_hdus[1].header['CD1_1'], sip_hdus[1].header['CD1_2']],
-        #          [sip_hdus[1].header['CD2_1'], sip_hdus[1].header['CD2_2']]])
-
-        cdmat = np.array([[self.grism_image[1].header['CD1_1'], self.grism_image[1].header['CD1_2']],
-                          [self.grism_image[1].header['CD2_1'], self.grism_image[1].header['CD2_2']]])
+        cdmat = np.array([[self.grism_image[1].header['CD1_1'],
+                           self.grism_image[1].header['CD1_2']],
+                          [self.grism_image[1].header['CD2_1'],
+                           self.grism_image[1].header['CD2_2']]])
 
         a_polycoef = {}
         for key in acoef:
@@ -203,7 +190,7 @@ class GrismObs():
 
         bp_polycoef = {}
         for key in bpcoef:
-             bp_polycoef['c' + key.split('BP_')[1]] = bpcoef[key]
+            bp_polycoef['c' + key.split('BP_')[1]] = bpcoef[key]
 
         a_poly = models.Polynomial2D(a_order, **a_polycoef)
         b_poly = models.Polynomial2D(b_order, **b_polycoef)
@@ -212,17 +199,21 @@ class GrismObs():
 
         # See SIP definition paper for definition of u, v, f, g
         # TODO: maybe don't hardcode the pole to rotate around (180 for HST)?
-        SIP_forward = (models.Shift(-(crpix[0]-1)) & models.Shift(-(crpix[1]-1)) | # Calculate u and v
-             models.Mapping((0, 1, 0, 1, 0, 1)) | a_poly & b_poly & models.Identity(2) |
-             models.Mapping((0, 2, 1, 3)) | models.math.AddUfunc() & models.math.AddUfunc() |
-             models.AffineTransformation2D(matrix=cdmat) | models.Pix2Sky_TAN() |
-             models.RotateNative2Celestial(crval[0], crval[1], 180))
+        SIP_forward = (models.Shift(-(crpix[0]-1)) & models.Shift(-(crpix[1]-1)) |
+                       models.Mapping((0, 1, 0, 1, 0, 1)) | a_poly & b_poly & models.Identity(2) |
+                       models.Mapping((0, 2, 1, 3)) |
+                       models.math.AddUfunc() & models.math.AddUfunc() |
+                       models.AffineTransformation2D(matrix=cdmat) | models.Pix2Sky_TAN() |
+                       models.RotateNative2Celestial(crval[0], crval[1], 180))
 
         SIP_backward = (models.RotateCelestial2Native(crval[0], crval[1], 180) |
-            models.Sky2Pix_TAN() | models.AffineTransformation2D(matrix=cdmat).inverse |
-            models.Mapping((0, 1, 0, 1, 0, 1)) | ap_poly & bp_poly & models.Identity(2) |
-            models.Mapping((0, 2, 1, 3)) | models.math.AddUfunc() & models.math.AddUfunc() |
-            models.Shift((crpix[0]-1)) & models.Shift((crpix[1]-1)))
+                        models.Sky2Pix_TAN() |
+                        models.AffineTransformation2D(matrix=cdmat).inverse |
+                        models.Mapping((0, 1, 0, 1, 0, 1)) |
+                        ap_poly & bp_poly & models.Identity(2) |
+                        models.Mapping((0, 2, 1, 3)) |
+                        models.math.AddUfunc() & models.math.AddUfunc() |
+                        models.Shift((crpix[0]-1)) & models.Shift((crpix[1]-1)))
 
         full_distortion_model = SIP_forward & models.Identity(2)
         full_distortion_model.inverse = SIP_backward & models.Identity(2)
@@ -232,9 +223,9 @@ class GrismObs():
         det_frame = cf.Frame2D(name="detector")
         imagepipe.append((det_frame, full_distortion_model))
 
-        world_frame = cf.CelestialFrame(name="world", unit = (u.Unit("deg"), u.Unit("deg")),
-                             axes_names=('lon', 'lat'), axes_order=(0, 1),
-                             reference_frame="ICRS")
+        world_frame = cf.CelestialFrame(name="world", unit=(u.Unit("deg"), u.Unit("deg")),
+                                        axes_names=('lon', 'lat'), axes_order=(0, 1),
+                                        reference_frame="ICRS")
         imagepipe.append((world_frame, None))
 
         grism_pipeline.extend(imagepipe)

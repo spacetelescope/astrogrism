@@ -1,7 +1,5 @@
 import numpy as np
-from scipy.interpolate import interp1d
-from astropy.modeling.models import custom_model, Tabular1D
-from astropy.modeling import Model, Parameter
+from astropy.modeling import Model
 from asdf.extension import Converter
 
 
@@ -21,7 +19,7 @@ class DISPXY_Model(Model):
 
         if self.ematrix.shape == (2,):
             # Reshape to add second dimension for ematrix with only two values
-            self.ematrix = np.reshape(self.ematrix, [2,1])
+            self.ematrix = np.reshape(self.ematrix, [2, 1])
 
         if len(self.ematrix.shape) > 1:
             if self.inv and self.ematrix.shape[1] > 2:
@@ -33,7 +31,6 @@ class DISPXY_Model(Model):
 
     # Note that in the inverse case, input "t" here is actually dx or dy
     def evaluate(self, x, y, t):
-        inv = self.inv
 
         e = self.ematrix
         offset = self.offset
@@ -60,13 +57,14 @@ class DISPXY_Model(Model):
         f = 0
 
         if self.inv:
-            f = ((t + offset - np.dot(coeffs[c_order], e[0,:])) /
-                  np.dot(coeffs[c_order], e[1,:]))
+            f = ((t + offset - np.dot(coeffs[c_order], e[0, :])) /
+                 np.dot(coeffs[c_order], e[1, :]))
         else:
             for i in range(0, t_order):
-                f += t**i * (np.dot(coeffs[c_order], e[i,:]))
+                f += t**i * (np.dot(coeffs[c_order], e[i, :]))
 
         return f
+
 
 class DISPXY_ModelConverter(Converter):
     tags = ["tag:stsci.edu:grismstuff/dispxy_model-*"]
@@ -81,8 +79,8 @@ class DISPXY_ModelConverter(Converter):
         inverse_flag = node['inverse_flag']
         return DISPXY_Model(ematrix, inverse_flag)
 
+
 class DISPXY_Extension():
     extension_uri = "asdf://stsci.edu/grismstuff/extensions/extension-1.0"
     converters = [DISPXY_ModelConverter()]
     tags = ["tag:stsci.edu:grismstuff/dispxy_model-1.0.0"]
-    #tags = ["asdf://stsci.edu/grismstuff/tags/dispxy_model-1.0"]
