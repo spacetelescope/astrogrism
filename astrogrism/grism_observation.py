@@ -7,9 +7,8 @@ from gwcs import coordinate_frames as cf
 import numpy as np
 import pathlib
 
-from .HST.transform_models import WFC3IRForwardGrismDispersion, \
-                                  WFC3IRBackwardGrismDispersion
-from .HST.dispersion_models import DISPXY_Extension
+from HST.transform_models import WFC3IRForwardGrismDispersion, WFC3IRBackwardGrismDispersion
+from HST.dispersion_models import DISPXY_Extension
 
 pkg_dir = pathlib.Path(__file__).parent.absolute()
 
