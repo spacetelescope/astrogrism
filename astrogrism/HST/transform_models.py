@@ -1,6 +1,6 @@
 import numpy as np
 from astropy.modeling.core import Model
-from astropy.modeling.models import Rotation2D, Mapping, Tabular1D, Const1D
+from astropy.modeling.models import (Rotation2D, Identity, Mapping, Tabular1D, Const1D)
 from astropy.modeling.models import math as astmath
 
 
@@ -92,12 +92,8 @@ class WFC3IRForwardGrismDispersion(Model):
         except KeyError:
             raise ValueError("Specified order is not available")
 
-        # The next two lines are to get around the fact that
-        # modeling.standard_broadcasting=False does not work.
-        # x00 = x0.flatten()[0]
-        # y00 = y0.flatten()[0]
+        t = np.linspace(0, 1, 10)
 
-        t = np.linspace(0, 1, 10)  # sample t
         xmodel = self.xmodels[iorder]
         ymodel = self.ymodels[iorder]
         lmodel = self.lmodels[iorder]
@@ -113,9 +109,17 @@ class WFC3IRForwardGrismDispersion(Model):
         tab = Tabular1D(dx[so], t[so], bounds_error=False, fill_value=None)
 
         dxr = astmath.SubtractUfunc()
-        wavelength = dxr | tab | lmodel
-        model = Mapping((2, 3, 0, 2, 4)) | \
-            Const1D(x0) & Const1D(y0) & wavelength & Const1D(order)
+
+        # Need to build this compound model differently depending on lmodel inputs
+        if lmodel.n_inputs == 1:
+            wavelength = dxr | tab | lmodel
+            model = Mapping((2, 3, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
+                                                wavelength & Const1D(order))
+        elif lmodel.n_inputs == 3:
+            wavelength = Identity(2) & dxr | Identity(2) & tab | lmodel
+            model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
+                                                      wavelength & Const1D(order))
+
         return model(x, y, x0, y0, order)
 
 
@@ -154,13 +158,17 @@ class WFC3IRBackwardGrismDispersion(Model):
     n_outputs = 5
 
     def __init__(self, orders, lmodels=None, xmodels=None,
-                 ymodels=None, theta=None, name=None, meta=None):
+                 ymodels=None, theta=None, name=None, meta=None,
+                 interpolate_t=False):
         self._order_mapping = {int(k): v for v, k in enumerate(orders)}
         self.xmodels = xmodels
+        # TODO: Raise a warning if no inverse transform is possible (for example
+        # the current state of UVIS)
         self.ymodels = ymodels
         self.lmodels = lmodels
         self.orders = orders
         self.theta = theta
+        self.interpolate_t = interpolate_t
         meta = {"orders": orders}
         if name is None:
             name = 'wfc3ir_backward_grism_dispersion'
@@ -197,6 +205,8 @@ class WFC3IRBackwardGrismDispersion(Model):
         usu. taken to be the different between fwcpos_ref in the specwcs
         reference file and fwcpos from the input image.
         """
+        if self.ymodels is None:
+            return None
         if wavelength < 0:
             raise ValueError("Wavelength should be greater than zero")
 
@@ -207,7 +217,22 @@ class WFC3IRBackwardGrismDispersion(Model):
         except KeyError:
             raise ValueError("Specified order is not available")
 
-        t = self.lmodels[iorder](wavelength)
+        if self.interpolate_t:
+            # If the displ coefficients are too complex to invert, have to interpolate t
+            t = np.linspace(-1, 2, 40)
+            if self.lmodels[iorder].n_inputs == 1:
+                l = self.lmodels[iorder].evaluate(t)
+            elif self.lmodels[iorder].n_inputs == 3:
+                l = self.lmodels[iorder].evaluate(x, y, t)
+            so = np.argsort(l)
+            tab = Tabular1D(l[so], t[so], bounds_error=False, fill_value=None)
+            t = tab(wavelength)
+        else:
+            if self.lmodels[iorder].n_inputs == 1:
+                t = self.lmodels[iorder](wavelength)
+            elif self.lmodels[iorder].n_inputs == 3:
+                t = self.lmodels[iorder](x, y, wavelength)
+
         xmodel = self.xmodels[iorder]
         ymodel = self.ymodels[iorder]
 
