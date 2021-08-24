@@ -6,4 +6,4 @@ except ImportError:
     __version__ = ''
 
 # Expose subpackage API at package level.
-from .grism_observation import GrismObs # noqa
+from astrogrism.grism_observation import GrismObs # noqa
