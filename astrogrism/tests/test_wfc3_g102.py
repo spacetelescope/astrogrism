@@ -11,7 +11,7 @@ import numpy as np
 
 # TODO: Switch to importlib
 test_dir = pathlib.Path(__file__).parent.absolute()
-G102_IMAGE_FILE = 'https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits' # noqa
+G102_IMAGE_FILE = test_dir / 'data'/ 'IRG102_icwz15e7q_flt.fits' # noqa
 
 
 def test_wfc3_g102_astropywcs():
@@ -33,7 +33,7 @@ def test_wfc3_g102_astropywcs():
     astropywcs_dec = astropy_coords.dec.value
 
     # Init GrismObs
-    fn = download_file(G102_IMAGE_FILE, cache=True)
+    fn = G102_IMAGE_FILE
     grismobs = GrismObs(fn)
     # Retrieve Transform
     image2world = grismobs.geometric_transforms.get_transform('detector',
@@ -94,7 +94,7 @@ def test_wfc3_g102_grismconf():
 def _image2grism(x_center, y_center, wavelengths, grism_file=None):
     if not grism_file:
         raise NotImplementedError("Grism FLT File is required for now")
-    fn = download_file(grism_file, cache=True)
+    fn = G102_IMAGE_FILE
     grismobs = GrismObs(fn)
     image2grism = grismobs.geometric_transforms.get_transform('detector',
                                                               'grism_detector')
