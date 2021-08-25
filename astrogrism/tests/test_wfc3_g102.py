@@ -90,8 +90,8 @@ def test_wfc3_g102_grismconf():
     np.testing.assert_allclose(astrogrism_y, grismconf_y, atol=5e-02)
 
 
-def _image2grism(x_center, y_center, wavelengths):
-    fn = download_file(grism_image_file, cache=True)
+def _image2grism(x_center, y_center, wavelengths, grism_file=None):
+    fn = download_file(grism_file, cache=True)
     grismobs = GrismObs(fn)
     image2grism = grismobs.geometric_transforms.get_transform('detector',
                                                               'grism_detector')
