@@ -23,7 +23,7 @@ def test_wfc3_g102_astropywcs():
     xx = np.arange(0, 1014, 20)
     yy = np.arange(0, 1014, 20)
     # Download file and initialize wcs
-    fn = download_file(grism_image_file, cache=True)
+    fn = G102_IMAGE_FILE
     grism_image_hdulist = fits.open(fn)
     astropy_wcs = WCS(grism_image_hdulist['SCI'].header)
     # Convert Pixel Grid to Sky Grid
