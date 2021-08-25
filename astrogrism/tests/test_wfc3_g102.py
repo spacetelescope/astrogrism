@@ -11,7 +11,7 @@ import numpy as np
 
 # TODO: Switch to importlib
 test_dir = pathlib.Path(__file__).parent.absolute()
-G102_IMAGE_FILE = test_dir / 'data'/ 'IRG102_icwz15e7q_flt.fits' # noqa
+G102_IMAGE_FILE = str(test_dir / 'data'/ 'IRG102_icwz15e7q_flt.fits') # noqa
 
 
 def test_wfc3_g102_astropywcs():
