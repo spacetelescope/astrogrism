@@ -11,7 +11,7 @@ import numpy as np
 
 # TODO: Switch to importlib
 test_dir = pathlib.Path(__file__).parent.absolute()
-grism_image_file = 'https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits' # noqa
+G141_IMAGE_FILE = 'https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits' # noqa
 
 
 def test_wfc3_g141_astropywcs():
@@ -33,7 +33,7 @@ def test_wfc3_g141_astropywcs():
     astropywcs_dec = astropy_coords.dec.value
 
     # Init GrismObs
-    fn = download_file(grism_image_file, cache=True)
+    fn = download_file(G141_IMAGE_FILE, cache=True)
     grismobs = GrismObs(fn)
     # Retrieve Transform
     image2world = grismobs.geometric_transforms.get_transform('detector',
@@ -83,7 +83,8 @@ def test_wfc3_g141_grismconf():
     # Calculate Astrogrism dispersed Xs and Ys for given wavelengths
     astrogrism_x, astrogrism_y = _image2grism(x_center,
                                               y_center,
-                                              grismconf_wavelengths)
+                                              grismconf_wavelengths,
+                                              G141_IMAGE_FILE)
 
     # Compare results
     np.testing.assert_allclose(astrogrism_x, grismconf_x, atol=5e-02)
@@ -102,7 +103,10 @@ def test_wfc3_g141_grizli():
                                            'grizli_wfc3_g141_solutions',
                                            'grizli_wavelength_solutions.npy')
     grizli_wavelengths = np.load(grizli_wavelengths_file)
-    astrogrism_x, astrogrism_y = _image2grism(500, 500, grizli_wavelengths)
+    astrogrism_x, astrogrism_y = _image2grism(500,
+                                              500,
+                                              grizli_wavelengths,
+                                              G141_IMAGE_FILE)
 
     # Compare results
     np.testing.assert_allclose(astrogrism_x, 500 + np.arange(500), atol=5e-02)
@@ -113,8 +117,10 @@ def test_wfc3_g141_grizli():
     np.testing.assert_allclose(astrogrism_y, grizli_y, atol=5e-02)
 
 
-def _image2grism(x_center, y_center, wavelengths):
-    fn = download_file(grism_image_file, cache=True)
+def _image2grism(x_center, y_center, wavelengths, grism_file=None):
+    if not grism_file:
+        raise NotImplementedError("Grism FLT File is required for now")
+    fn = download_file(grism_file, cache=True)
     grismobs = GrismObs(fn)
     image2grism = grismobs.geometric_transforms.get_transform('detector',
                                                               'grism_detector')
