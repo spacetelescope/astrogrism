@@ -11,9 +11,10 @@ import pytest
 # TODO: Switch to importlib
 test_dir = pathlib.Path(__file__).parent.absolute()
 testdata = [
-    ('G141', download_file('https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits')),
-    ('G102', str(test_dir / 'data'/ 'IRG102_icwz15e7q_flt.fits'))
+    ('G141', download_file('https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits')), # noqa
+    ('G102', str(test_dir / 'data' / 'IRG102_icwz15e7q_flt.fits'))
 ]
+
 
 @pytest.mark.parametrize("grism,grism_image", testdata)
 def test_wfc3_g141_grismconf(grism, grism_image):
@@ -25,12 +26,11 @@ def test_wfc3_g141_grismconf(grism, grism_image):
     fn = download_file(
         'https://github.com/npirzkal/GRISM_WFC3/archive/refs/heads/master.zip',
         cache='update')
-    
-    #grismconfdir = pathlib.Path(tempfile.gettempdir())
+
     with pathlib.Path(tempfile.TemporaryDirectory().name) as grismconfdir:
         with ZipFile(fn, 'r') as grismconfarchive:
             grismconfarchive.extractall(grismconfdir)
-    
+
         # Initialize Grismconf and initial parameters
         grismconf_lookup = {
             'G141': pathlib.Path('GRISM_WFC3-master/IR/G141.conf'),
@@ -68,6 +68,7 @@ def test_wfc3_g141_grismconf(grism, grism_image):
     # Compare results
     np.testing.assert_allclose(astrogrism_x, grismconf_x, atol=5e-02)
     np.testing.assert_allclose(astrogrism_y, grismconf_y, atol=5e-02)
+
 
 def _image2grism(x_center, y_center, wavelengths, grism_file=None):
     if not grism_file:
