@@ -16,7 +16,7 @@ testdata = [
 
 
 @pytest.mark.parametrize('grism_image', testdata)
-def test_wfc3_g102_astropywcs(grism_image):
+def test_wfc3_astropywcs(grism_image):
     """
     Tests the Astrogrism Detector > World Transform against
     the built in Astropy WCS model

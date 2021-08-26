@@ -17,7 +17,7 @@ testdata = [
 
 
 @pytest.mark.parametrize("grism,grism_image", testdata)
-def test_wfc3_g141_grismconf(grism, grism_image):
+def test_wfc3_grismconf(grism, grism_image):
     """
     Tests the Astrogrism Detector > Grism Transform against
     grismconf's grism transform
