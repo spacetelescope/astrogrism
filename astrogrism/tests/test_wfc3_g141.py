@@ -46,51 +46,6 @@ def test_wfc3_g141_astropywcs():
     np.testing.assert_allclose(astrogrism_dec, astropywcs_dec, atol=5e-02)
 
 
-def test_wfc3_g141_grismconf():
-    """
-    Tests the Astrogrism Detector > Grism Transform against
-    grismconf's grism transform
-    """
-    # Download grismconf repo
-    fn = download_file(
-        'https://github.com/npirzkal/GRISM_WFC3/archive/refs/heads/master.zip')
-    with ZipFile(fn, 'r') as grismconfarchive:
-        grismconfarchive.extractall(tempfile.gettempdir())
-    grismconfdir = pathlib.Path(tempfile.gettempdir())
-
-    # Initialize Grismconf and initial parameters
-    C = grismconf.Config(
-            grismconfdir / 'GRISM_WFC3-master' / 'IR' / 'G141.conf')
-    x_center = 500
-    y_center = 500
-    dt = np.abs(1/(C.DISPX('+1',
-                           x_center,
-                           y_center,
-                           1) - C.DISPX('+1',
-                                        x_center,
-                                        y_center,
-                                        0)))
-    t = np.arange(0, 1, dt)
-    # Calculate X and Y offsets
-    xoffsets = C.DISPX('+1', x_center, y_center, t)
-    yoffsets = C.DISPY('+1', x_center, y_center, t)
-    # Grab corresponding wavelengths
-    grismconf_wavelengths = C.DISPL('+1', x_center, y_center, t)/1e4
-    # Calculate dispersed Xs and Ys
-    grismconf_x = xoffsets+x_center
-    grismconf_y = yoffsets+y_center
-
-    # Calculate Astrogrism dispersed Xs and Ys for given wavelengths
-    astrogrism_x, astrogrism_y = _image2grism(x_center,
-                                              y_center,
-                                              grismconf_wavelengths,
-                                              G141_IMAGE_FILE)
-
-    # Compare results
-    np.testing.assert_allclose(astrogrism_x, grismconf_x, atol=5e-02)
-    np.testing.assert_allclose(astrogrism_y, grismconf_y, atol=5e-02)
-
-
 def test_wfc3_g141_grizli():
     """
     Tests the Astrogrism Detector > Grism Transform against
