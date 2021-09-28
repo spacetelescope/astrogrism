@@ -37,8 +37,7 @@ def test_wfc3_grismconf(grism, grism_image):
             'G102': pathlib.Path('GRISM_WFC3-master/IR/G102.conf')
         }
 
-        C = grismconf.Config(
-                grismconfdir / grismconf_lookup[grism])
+        C = grismconf.Config(grismconfdir / grismconf_lookup[grism])
 
     x_center = 500
     y_center = 500
