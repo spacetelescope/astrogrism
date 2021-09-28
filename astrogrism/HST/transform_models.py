@@ -219,7 +219,7 @@ class WFC3IRBackwardGrismDispersion(Model):
 
         if self.interpolate_t:
             # If the displ coefficients are too complex to invert, have to interpolate t
-            t = np.linspace(-1, 2, 1000)
+            t = np.linspace(0, 1, 1000)
             if self.lmodels[iorder].n_inputs == 1:
                 l = self.lmodels[iorder].evaluate(t)
             elif self.lmodels[iorder].n_inputs == 3:
