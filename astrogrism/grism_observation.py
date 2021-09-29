@@ -107,7 +107,8 @@ class GrismObs():
                                                        filter)
 
         # Build the grism_detector <-> detector transforms
-        specwcs = asdf.open(str(spec_wcs_file)).tree
+        with asdf.open(str(spec_wcs_file)) as f:
+            specwcs = f.tree
         displ = specwcs['displ']
         dispx = specwcs['dispx']
         dispy = specwcs['dispy']
@@ -160,6 +161,8 @@ class GrismObs():
         # Get the inverse SIP polynomial coefficients from file
         apcoef = dict(sip_hdu.header['AP_*'])
         bpcoef = dict(sip_hdu.header['BP_*'])
+
+        sip_hdus.close()
 
         try:
             ap_order = apcoef.pop('AP_ORDER')
