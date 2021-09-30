@@ -39,16 +39,13 @@ def test_wfc3_grismconf(grism, grism_image):
 
         C = grismconf.Config(grismconfdir / grismconf_lookup[grism])
 
+    # Define the center coordinates
     x_center = 500
     y_center = 500
-    dt = np.abs(1/(C.DISPX('+1',
-                           x_center,
-                           y_center,
-                           1) - C.DISPX('+1',
-                                        x_center,
-                                        y_center,
-                                        0)))
-    t = np.arange(0, 1, dt)
+
+    # Test translation on 20 steps, arbitrarily
+    t = np.arange(0, 1, 0.05)
+
     # Calculate X and Y offsets
     xoffsets = C.DISPX('+1', x_center, y_center, t)
     yoffsets = C.DISPY('+1', x_center, y_center, t)
