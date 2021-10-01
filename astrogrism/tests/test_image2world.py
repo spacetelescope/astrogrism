@@ -10,7 +10,7 @@ import pytest
 # TODO: Switch to importlib
 test_dir = pathlib.Path(__file__).parent.absolute()
 testdata = [
-    download_file('https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits'), # noqa
+    str(test_dir / 'data' / 'IRG141_ib6o23rsq_flt.fits'),
     str(test_dir / 'data' / 'IRG102_icwz15e7q_flt.fits')
 ]
 
