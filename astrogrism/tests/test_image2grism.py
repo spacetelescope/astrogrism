@@ -3,7 +3,6 @@ import tempfile
 from zipfile import ZipFile
 
 from astrogrism import GrismObs
-from astropy.utils.data import download_file
 import grismconf
 import numpy as np
 import pytest

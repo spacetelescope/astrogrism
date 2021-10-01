@@ -2,7 +2,6 @@ import pathlib
 
 from astrogrism import GrismObs
 from astropy.io import fits
-from astropy.utils.data import download_file
 from astropy.wcs import WCS
 import numpy as np
 import pytest
