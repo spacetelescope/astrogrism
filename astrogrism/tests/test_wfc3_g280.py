@@ -28,12 +28,12 @@ def test_wfc3_g280_grismconf():
     d2g2 = grism_obs.geometric_transforms["CCD2"].get_transform("detector", "grism_detector")
 
     d2g1_expected = (1247.1169881075878, 1680.2088037732872, 1500.0, 1500.0, 1.0)
-
     np.testing.assert_allclose(d2g1(1500.0, 1500.0, 5000, 1.0), d2g1_expected, atol=5e-2)
 
-    d2g2(1500.0, 1500.0, 5000, 1.0)
+    d2g2_expected = (750.5270115330625, 1671.8505273099233, 1000.0, 1500.0, 1.0)
+    np.testing.assert_allclose(d2g2(1000.0, 1500.0, 5000, 1.0), d2g2_expected, atol=5e-2)
 
-    world_ref = (206.4318333333, 26.41859444444, 3000, 1.0)
+    world_ref = (206.4318333333, 26.41859444444, 4000, 1.0)
 
     g2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("grism_detector", "world")
     w2g1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "grism_detector")
@@ -44,18 +44,23 @@ def test_wfc3_g280_grismconf():
     d2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("detector", "world")
     w2d1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "detector")
 
-    w2g1_expected = (1941.6595214832005, 1245.834729587761, 2047.2667314355476,
+    w2g1_expected = (1869.7387435684468, 1245.8356517642842, 2047.2667314355476,
                      1070.8144590508862, 1.0)
+    w2g2_expected = (1873.0879758597869, 1237.8689879427377, 2047.2665683303317,
+                     1070.814770017469, 1.0)
 
-    np.testing.assert_allclose(w2g1(206.4318333333, 26.41859444444, 3000, 1.0),
-                               w2g1_expected, atol=5e-5)
+    np.testing.assert_allclose(w2g1(*world_ref), w2g1_expected, atol=5e-5)
 
-    np.testing.assert_allclose(w2d1(206.4318333333, 26.41859444444, 3000, 1.0),
-                               (2047.2667314355476, 1070.8144590508862, 3000.0, 1.0),
+    # Use rtol here because the wavelength doesn't round trip perfectly
+    np.testing.assert_allclose(g2w1(*w2g1_expected), world_ref, rtol=0.005)
+
+    np.testing.assert_allclose(w2d1(*world_ref),
+                               (2047.2667314355476, 1070.8144590508862, 4000.0, 1.0),
                                atol=5e-5)
 
-    np.testing.assert_allclose(d2w1(2047.2667314355476, 1070.8144590508862, 3000.0, 1.0),
+    np.testing.assert_allclose(d2w1(2047.2667314355476, 1070.8144590508862, 4000.0, 1.0),
                                world_ref, atol=5e-5)
 
-
+    np.testing.assert_allclose(w2g2(*world_ref), w2g2_expected, atol=5e-5)
+    np.testing.assert_allclose(g2w2(*w2g2_expected), world_ref, rtol=0.005)
 
