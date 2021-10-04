@@ -3,6 +3,7 @@ import tempfile
 from zipfile import ZipFile
 
 from astrogrism import GrismObs
+from astropy.utils.data import download_file
 import grismconf
 import numpy as np
 import pytest
@@ -64,6 +65,14 @@ def test_wfc3_grismconf(grism, grism_image):
     np.testing.assert_allclose(astrogrism_x, grismconf_x, atol=5e-02)
     np.testing.assert_allclose(astrogrism_y, grismconf_y, atol=5e-02)
 
+    # Test Roundtripping
+    roundtrip_wavelengths = _grism2image(x_center,
+                                         y_center,
+                                         astrogrism_x,
+                                         astrogrism_y,
+                                         grism_image)
+    np.testing.assert_allclose(roundtrip_wavelengths, grismconf_wavelengths)
+
 
 def _image2grism(x_center, y_center, wavelengths, grism_file=None):
     if not grism_file:
@@ -80,3 +89,18 @@ def _image2grism(x_center, y_center, wavelengths, grism_file=None):
         x.append(dispersion[0])
         y.append(dispersion[1])
     return x, y
+
+
+def _grism2image(x_center, y_center, x_dispersion, y_dispersion, grism_file=None):
+    if not grism_file:
+        raise NotImplementedError("Grism FLT File is required for now")
+    grismobs = GrismObs(grism_file)
+    grism2image = grismobs.geometric_transforms.get_transform('grism_detector',
+                                                              'detector')
+    if len(x_dispersion) != len(y_dispersion):
+        raise AttributeError("Non-equal quantities of coordinates provided")
+    wavelengths = list()
+    for x, y in zip(x_dispersion, y_dispersion):
+        _, _, wavelength, _ = grism2image.evaluate(x, y, x0=x_center, y0=y_center, order=1)
+        wavelengths.append(wavelength)
+    return wavelengths
