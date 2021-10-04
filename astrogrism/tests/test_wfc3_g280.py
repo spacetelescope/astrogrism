@@ -1,12 +1,6 @@
 from astrogrism import GrismObs
-import grismconf
 
 import pathlib
-import tempfile
-from zipfile import ZipFile
-from astropy.utils.data import download_file
-from astropy.io import fits
-from astropy.wcs import WCS
 import numpy as np
 
 # TODO: Switch to importlib
@@ -42,9 +36,6 @@ def test_wfc3_g280_roundtrip():
 
     g2w2 = grism_obs.geometric_transforms["CCD2"].get_transform("grism_detector", "world")
     w2g2 = grism_obs.geometric_transforms["CCD2"].get_transform("world", "grism_detector")
-
-    d2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("detector", "world")
-    w2d1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "detector")
 
     w2g1_expected = (1869.7387435684468, 1245.8356517642842, 2047.2667314355476,
                      1070.8144590508862, 1.0)
