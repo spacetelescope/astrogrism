@@ -13,7 +13,7 @@ def test_wfc3_g280_roundtrip():
     Tests Astrogrism transforms round tripping as expected between grism
     detector, direct detector and world frames.
     """
-    test_file = pathlib.Path(test_dir, "test_data", "uvis_test_file.fits")
+    test_file = pathlib.Path(test_dir, "data", "uvis_test_file.fits")
     grism_obs = GrismObs(str(test_file))
 
     assert grism_obs.geometric_transforms["CCD1"].available_frames == ['grism_detector',
