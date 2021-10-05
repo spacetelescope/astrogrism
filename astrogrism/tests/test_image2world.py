@@ -43,3 +43,10 @@ def test_wfc3_astropywcs(grism_image):
     # Compare results
     np.testing.assert_allclose(astrogrism_ra, astropywcs_ra, atol=5e-02)
     np.testing.assert_allclose(astrogrism_dec, astropywcs_dec, atol=5e-02)
+
+    # Check Roundtripping
+    world2image = grismobs.geometric_transforms.get_transform('world',
+                                                              'detector')
+    xx_roundtrip, yy_roundtrip, _, _ = world2image(astrogrism_ra, astrogrism_dec, 0, 0)
+    np.testing.assert_allclose(xx, xx_roundtrip, atol=5e-05)
+    np.testing.assert_allclose(yy, yy_roundtrip, atol=5e-05)
