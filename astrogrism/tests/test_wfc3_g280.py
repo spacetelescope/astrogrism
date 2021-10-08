@@ -5,7 +5,6 @@ import numpy as np
 
 # TODO: Switch to importlib
 test_dir = pathlib.Path(__file__).parent.absolute()
-grism_image_file = 'https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits' # noqa
 
 
 def test_wfc3_g280_roundtrip():
