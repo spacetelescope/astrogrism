@@ -207,7 +207,7 @@ class WFC3IRBackwardGrismDispersion(Model):
         """
         if self.ymodels is None:
             return None
-        if wavelength < 0:
+        if np.any(wavelength < 0):
             raise ValueError("Wavelength should be greater than zero")
 
         try:
@@ -219,7 +219,7 @@ class WFC3IRBackwardGrismDispersion(Model):
 
         if self.interpolate_t:
             # If the displ coefficients are too complex to invert, have to interpolate t
-            t = np.linspace(-1, 2, 40)
+            t = np.linspace(0, 1, 1000)
             if self.lmodels[iorder].n_inputs == 1:
                 l = self.lmodels[iorder].evaluate(t)
             elif self.lmodels[iorder].n_inputs == 3:
