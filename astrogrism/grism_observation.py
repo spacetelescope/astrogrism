@@ -57,14 +57,17 @@ class GrismObs():
             self.instrument = instrument
 
         if filter is None:
-            self.filter = self.grism_header["FILTER"]
+            if "FILTER" in self.grism_header:
+                self.filter = self.grism_header["FILTER"]
+            elif "FILTER1" in self.grism_header:
+                self.filter = self.grism_header["FILTER1"]
         else:
             self.filter = filter
 
         # Build GWCS geometric transform pipeline
         print(self.instrument)
-        if self.filter == "G280":
-            # Need to build transforms for both channels of UVIS
+        if self.filter in ("G280", "G800L"):
+            # Need to build transforms for both channels of WFC3 UVIS and ACS WFC
             self.geometric_transforms = {}
             self.geometric_transforms["CCD1"] = self._build_geometric_transforms(channel=1)
             self.geometric_transforms["CCD2"] = self._build_geometric_transforms(channel=2)
@@ -96,6 +99,9 @@ class GrismObs():
                 filter = self.filter
             elif self.filter == "G280":
                 instrument = f"{self.instrument}_UVIS"
+                filter = f"{self.filter}_CCD{channel}"
+            elif self.filter == "G800L":
+                instrument = "ACS_WFC"
                 filter = f"{self.filter}_CCD{channel}"
         else:
             instrument = self.instrument

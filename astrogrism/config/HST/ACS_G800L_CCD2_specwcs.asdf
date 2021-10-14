@@ -1,0 +1,293 @@
+#ASDF 1.0.0
+#ASDF_STANDARD 1.5.0
+%YAML 1.1
+%TAG ! tag:stsci.edu:asdf/
+--- !core/asdf-1.1.0
+asdf_library: !core/software-1.0.0 {author: The ASDF Developers, homepage: 'http://github.com/asdf-format/asdf',
+  name: asdf, version: 2.8.0.dev107+g8ccee8b}
+history:
+  entries:
+  - !core/history_entry-1.0.0
+    description: Created from config/HST/ACS.WFC.CHIP2.conf
+    software: !core/software-1.0.0 {author: STScI, homepage: 'https://github.com/spacetelescope/jwreftools',
+      name: nircam_reftools.py, version: 0.7.1}
+    time: 2021-10-14 17:13:46.237612
+  extensions:
+  - !core/extension_metadata-1.0.0
+    extension_class: asdf.extension.BuiltinExtension
+    software: !core/software-1.0.0 {name: asdf, version: 2.8.0.dev107+g8ccee8b}
+  - !core/extension_metadata-1.0.0 {extension_class: HST.dispersion_models.DISPXY_Extension,
+    extension_uri: 'asdf://stsci.edu/grismstuff/extensions/extension-1.0'}
+  - !core/extension_metadata-1.0.0
+    extension_class: astropy.io.misc.asdf.extension.AstropyAsdfExtension
+    software: !core/software-1.0.0 {name: astropy, version: 4.3.post1}
+channel: WFC
+displ:
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [3.530585e-05, -8.176143e-11, 1.798237e-09, -1.1963759999999999e-13, 7.680484e-15,
+      -7.300238e-13]
+    - [7.723688e-05, 2.6092890000000003e-09, -8.940777999999999e-09, 1.739126e-13,
+      -1.795554e-13, 3.3106369999999996e-12]
+    - [1.6658219999999999e-07, 5.414386e-10, 6.442418000000001e-09, -1.372717e-13,
+      1.4855729999999998e-14, -3.237297e-12]
+    datatype: float64
+    shape: [3, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-9.74316e-05, -2.839996e-08, 2.3212840000000003e-08, -3.671343e-15, -2.479474e-16,
+      2.058769e-14]
+    - [0.0003901207, -1.094858e-11, 6.139751e-11, 1.5737390000000002e-15, 1.059856e-16,
+      -8.823743e-15]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [4.9028090000000005e-05, 1.163975e-09, -9.38134e-10, -3.428449e-14, -6.522886e-14,
+      1.030172e-13]
+    - [5.686211e-05, 2.129212e-09, -6.381495000000001e-10, 2.880905e-14, -1.431272e-13,
+      -5.431191e-13]
+    - [6.2208100000000005e-06, 1.035181e-09, -5.3644580000000005e-09, 1.255979e-13,
+      -2.1022780000000002e-13, 2.411707e-12]
+    datatype: float64
+    shape: [3, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [5.188665e-05, 1.488754e-09, -1.337463e-09, 2.169946e-16, -2.642968e-16, 9.553346e-16]
+    - [5.641731e-05, 2.076483e-09, -1.7834810000000002e-09, 3.338488e-16, -4.0662449999999997e-16,
+      1.469606e-15]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [0.0001117842, 7.536997e-09, -5.941437e-09, -4.62228e-15, -1.2249019999999999e-15,
+      -2.533574e-14]
+    - [-7.053686e-05, -3.511676e-09, 2.722675e-09, 2.014833e-15, 5.342117e-16, 1.104351e-14]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [8.514450999999999e-05, 4.957285e-09, -3.983301e-09, 9.133871e-16, -2.6624999999999998e-15,
+      -5.428841e-15]
+    - [-4.8339339999999996e-05, -2.283549e-09, 1.882654e-09, -4.059601e-16, 1.183297e-15,
+      2.412795e-15]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [0.0001138984, 6.1966949999999996e-09, -4.745748000000001e-09, 2.500964e-15,
+      5.325948e-15, 2.008293e-14]
+    - [-6.919003000000001e-05, -3.607242e-09, 2.555924e-09, -1.352569e-15, -2.880431e-15,
+      -1.086119e-14]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+dispx:
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-30.0, -1.418549e-10, -2.548547e-12, 3.278261e-14, -5.252854e-15, 1.50281e-14]
+    - [190.0, -9.613752e-11, 2.472043e-10, 5.201e-14, 2.411283e-14, -1.474107e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-140.0, 3.804923e-11, 8.050697e-11, -8.097642e-14, 1.919717e-13, -1.658486e-13]
+    - [60.0, 1.670978e-10, 2.372891e-10, -4.358361e-14, -6.133692e-14, -6.269879e-14]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [120.0, -3.123476e-10, 1.33081e-09, 1.280414e-13, -1.130734e-13, -4.853113e-13]
+    - [290.0, -2.184814e-09, -1.099346e-09, 5.657141e-13, 3.89242e-15, 5.137454e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [260.0, 9.571075e-10, -1.024505e-09, -9.098757e-14, -2.598237e-13, 5.472127e-13]
+    - [400.0, -2.57506e-09, -4.009863e-10, 4.553665e-13, 1.285841e-13, 3.075652e-14]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-390.0, 1.630481e-09, 6.269363e-10, -3.368985e-13, -1.922373e-13, 3.674916e-13]
+    - [170.0, 5.023407e-09, -3.892652e-09, -8.332809e-13, -1.01215e-12, 2.271021e-12]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-540.0, 4.17247e-10, -4.304147e-10, -3.887305e-13, 1.112183e-12, -1.016243e-12]
+    - [240.0, 1.41006e-09, 9.871602e-10, -2.11276e-13, -1.904944e-13, -1.835105e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-980.0, -4.482609e-09, 4.550542e-09, 6.714509e-13, 5.451123e-13, -3.131832e-12]
+    - [530.0, -7.883296e-10, -1.060391e-09, 2.225652e-13, -9.089331e-14, 9.381535e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+dispy:
+- &id001 !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [0.994102, -0.00048608, -0.0004793, 3.388e-08, 1.9786e-07, 8.209e-08]
+    - [-4.7196, 0.00019684, -0.0011571, -2.66e-08, -1.178e-08, 2.0653e-07]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- &id002 !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [3.726502, -0.00060004, 0.0001906, 4.928e-08, 2.0468e-07, -3.748e-08]
+    - [-1.4904, 6.216e-05, -0.0003654, -8.4e-09, -3.72e-09, 6.522e-08]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- &id003 !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-2.38112, -0.0003746, -0.00211224, 2.89e-08, 2.0154e-07, 5.148e-07]
+    - [-8.6188, 0.00063655, 0.00192792, -1.653e-07, 4.118e-08, -1.4964e-06]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- &id004 !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-6.369564, -0.000139156, -0.0014624, -3.408e-08, 2.0534e-07, -6.28e-08]
+    - [-10.452, 0.00035976, -0.001456, -8.4e-08, 1.316e-07, -2.64e-07]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- &id005 !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [8.8003, -0.000487, 0.002604, 3.282e-08, 1.2017e-07, -2.0388e-07]
+    - [-2.7608, -0.000629, -0.003332, 1.4824e-07, 6.919e-08, 9.5064e-07]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- &id006 !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [12.93796, -0.00144566, 0.002064, 2.3447e-07, 1.058e-07, 5.5754e-07]
+    - [-4.4544, 0.00033096, -0.003744, -7.44e-08, 2.364e-07, 6.2376e-07]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+- &id007 !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [24.5288, -0.00253142, 0.00054968, 4.11e-07, 5.0e-07, 2.1684e-06]
+    - [-14.5644, 0.00183327, 0.00269452, -3.18e-07, -4.505e-07, -2.4274e-06]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: false
+invdispx:
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-30.0, -1.418549e-10, -2.548547e-12, 3.278261e-14, -5.252854e-15, 1.50281e-14]
+    - [190.0, -9.613752e-11, 2.472043e-10, 5.201e-14, 2.411283e-14, -1.474107e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: true
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-140.0, 3.804923e-11, 8.050697e-11, -8.097642e-14, 1.919717e-13, -1.658486e-13]
+    - [60.0, 1.670978e-10, 2.372891e-10, -4.358361e-14, -6.133692e-14, -6.269879e-14]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: true
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [120.0, -3.123476e-10, 1.33081e-09, 1.280414e-13, -1.130734e-13, -4.853113e-13]
+    - [290.0, -2.184814e-09, -1.099346e-09, 5.657141e-13, 3.89242e-15, 5.137454e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: true
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [260.0, 9.571075e-10, -1.024505e-09, -9.098757e-14, -2.598237e-13, 5.472127e-13]
+    - [400.0, -2.57506e-09, -4.009863e-10, 4.553665e-13, 1.285841e-13, 3.075652e-14]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: true
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-390.0, 1.630481e-09, 6.269363e-10, -3.368985e-13, -1.922373e-13, 3.674916e-13]
+    - [170.0, 5.023407e-09, -3.892652e-09, -8.332809e-13, -1.01215e-12, 2.271021e-12]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: true
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-540.0, 4.17247e-10, -4.304147e-10, -3.887305e-13, 1.112183e-12, -1.016243e-12]
+    - [240.0, 1.41006e-09, 9.871602e-10, -2.11276e-13, -1.904944e-13, -1.835105e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: true
+- !<tag:stsci.edu:grismstuff/dispxy_model-1.0.0>
+  ematrix: !core/ndarray-1.0.0
+    data:
+    - [-980.0, -4.482609e-09, 4.550542e-09, 6.714509e-13, 5.451123e-13, -3.131832e-12]
+    - [530.0, -7.883296e-10, -1.060391e-09, 2.225652e-13, -9.089331e-14, 9.381535e-13]
+    datatype: float64
+    shape: [2, 6]
+  inverse_flag: true
+invdispy:
+- *id001
+- *id002
+- *id003
+- *id004
+- *id005
+- *id006
+- *id007
+meta:
+  author: STScI
+  date: '2021-10-14T17:13:46.320'
+  description: G800L dispersion models
+  exposure: {p_exptype: NRC_WFSS|NRC_TSGRISM}
+  filename: ACS_G800L_CCD2_specwcs.asdf
+  input_units: !unit/unit-1.0.0 'um'
+  instrument: {}
+  model_type: WFC3GrismModel
+  output_units: !unit/unit-1.0.0 'um'
+  pedigree: ground
+  reftype: specwcs
+  telescope: HST
+  title: HST WFC Grism Parameters
+  useafter: '2014-01-01T00:00:00'
+order: [1, 0, 2, 3, -1, -2, -3]
+...

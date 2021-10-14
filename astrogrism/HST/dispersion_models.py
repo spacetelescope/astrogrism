@@ -22,7 +22,7 @@ class DISPXY_Model(Model):
             self.ematrix = np.reshape(self.ematrix, [2, 1])
 
         if len(self.ematrix.shape) > 1:
-            if self.inv and self.ematrix.shape[1] > 2:
+            if self.inv and self.ematrix.shape[0] > 2:
                 # Can't invert these here, need to interpolate from the other direction
                 raise ValueError("Can't invert higher order coefficient matrices")
 
