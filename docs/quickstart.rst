@@ -13,7 +13,7 @@ To load your data, simply run the following in a Python interpreter or Jupyter
 notebook cell::
     
     from astrogrism.grism_observation import GrismObs
-    g_obs = GrismObs("sample_file.fits")
+    g_obs = GrismObs("sample_grism_flt.fits")
 
 This object makes available the tranforms between the ``world``, ``detector`` 
 (i.e. the undispersed direct image), and ``grism_detector`` frames. To get 
@@ -22,4 +22,18 @@ can call::
 
     world_to_grism = g_obs.geometric_transforms.get_transform("world", "grism_detector")
 
+This transform would then allow you to calculate the coordinates on the dispered image
+given a right ascension and declination (currently required to be in degrees), the
+wavelength of interest, and the order of the dispersed spectrum::
 
+    world_to_grism(264.10183, -32.90802, 0.7, 1.0)
+
+This returns a tuple of values (x_d, y_d, x_g, y_g, order), where _d denotes 
+coordinates on the direct image, and _g denotes the dispersed coordinates on 
+the grism image.
+
+Note that, in addition to the geometric transforms, the ``GrismObs`` object 
+stores the contents of the input FITS file as an ``astropy`` HDUList in the 
+``grism_image`` attribute. The direct image can also be loaded, e.g.:
+    
+    g_obs = GrismObs("sample_grism_flt.fits", direct_image="sample_direct.fits")
