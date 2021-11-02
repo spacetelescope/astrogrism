@@ -37,7 +37,7 @@ and ``order`` are the same as for the World frame.
 Grism Detector
 --------------
 
-Input/Output: ``(x0, y0, x, y, order)``
+Input/Output: ``(x, y, x0, y0, order)``
 
-All variables are unitless. ``x0`` and ``y0`` are the pixel positions on the direct detector.
-``x`` and ``y`` are the corresponding dispersed pixel locations on the grism detector. 
+All variables are unitless. ``x`` and ``y`` are the pixel positions on the direct detector.
+``x0`` and ``y0`` are the corresponding dispersed pixel locations on the grism detector. 

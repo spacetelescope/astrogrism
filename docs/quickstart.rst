@@ -33,9 +33,9 @@ wavelength of interest, and the order of the dispersed spectrum::
 
     world_to_grism(264.10183, -32.90802, 0.7, 1.0)
 
-This returns a tuple of values (x, y, x0, y0, order), where (x, y) denotes 
-coordinates on the direct image, and (x0, y0) denotes the dispersed coordinates on 
-the grism image. For more detail about the inputs and outputs of the geometric
+This returns a tuple of values ``(x, y, x0, y0, order)``, where ``(x, y)`` denotes 
+coordinates on the direct image, and ``(x0, y0)`` denotes the dispersed coordinates 
+on the grism image. For more detail about the inputs and outputs of the geometric
 transforms, see :ref:`transforms`.
 
 Note that, in addition to the geometric transforms, the ``GrismObs`` object 
