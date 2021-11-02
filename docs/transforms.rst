@@ -23,7 +23,7 @@ World
 Input/Output: ``(right ascension, declination, wavelength, order)``
 
 The ``right ascension`` and ``declination`` are specified in degrees. The 
-``wavelength`` units depend on instrument: Micron for ACS and WFC3 UVIS, 
+``wavelength`` units depend on instrument: Micron for ACS and WFC3 IR, 
 Angstrom for WFC3 UVIS. The dispersion ``order`` is a unitless integer. 
 
 Direct Detector
