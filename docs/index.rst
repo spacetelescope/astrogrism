@@ -8,8 +8,8 @@ built from the ground up. The project's goal is to bring together
 Hubble and James Webb Space Telescope grism reduction pipelines 
 and analysis functions into a unified ecosystem. Currently, the 
 Astrogrism makes the geometric transform framework used by JWST
-available for the HST WFC3 IR and UVIS grisms, as well as the HST
-ACS grism.
+available for use with the HST WFC3 IR and UVIS grisms, as well 
+as the HST ACS grism.
 
 
 Using Astrogrism
@@ -20,6 +20,7 @@ Using Astrogrism
 
   installation.rst
   quickstart.rst
+  transforms.rst
 
 
 Reference/API
