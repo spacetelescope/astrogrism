@@ -6,8 +6,6 @@ Installation
 
 The following details how to install the ``astrogrism`` Python package.
 
-If you encounter problems while following these installation instructions,
-please consult :ref:`known installation issues <known_issues_installation>`.
 
 Quick Installation
 ------------------
