@@ -1,10 +1,13 @@
+import warnings
+
 import numpy as np
+import astropy.units as u
 from astropy.modeling.core import Model
 from astropy.modeling.models import (Rotation2D, Identity, Mapping, Tabular1D, Const1D)
 from astropy.modeling.models import math as astmath
 
 
-class WFC3IRForwardGrismDispersion(Model):
+class AstrogrismForwardGrismDispersion(Model):
     """Return the transform from grism to image for the given spectral order.
 
     Parameters
@@ -40,18 +43,19 @@ class WFC3IRForwardGrismDispersion(Model):
     n_inputs = 5
     n_outputs = 4
 
-    def __init__(self, orders, lmodels=None, xmodels=None,
-                 ymodels=None, theta=0., name=None, meta=None):
+    def __init__(self, orders, lmodels=None, xmodels=None, ymodels=None,
+                 theta=0., name=None, meta=None, l_unit="micron"):
         self._order_mapping = {int(k): v for v, k in enumerate(orders)}
         self.xmodels = xmodels
         self.ymodels = ymodels
         self.lmodels = lmodels
         self.theta = theta
         self.orders = orders
+        self.l_unit = l_unit
         meta = {"orders": orders}
         if name is None:
-            name = 'wfc3ir_forward_row_grism_dispersion'
-        super(WFC3IRForwardGrismDispersion, self).__init__(name=name,
+            name = 'astrogrism_forward_grism_dispersion'
+        super(AstrogrismForwardGrismDispersion, self).__init__(name=name,
                                                            meta=meta)
         # starts with the backwards pixel and calculates the forward pixel
         self.inputs = ("x", "y", "x0", "y0", "order")
@@ -80,7 +84,7 @@ class WFC3IRForwardGrismDispersion(Model):
         Notes
         -----
         I kept the possibility of having a rotation like NIRISS, although I
-        don't know if there is a use case for it for WFC3.
+        don't know if there is a use case for it for HST instruments.
 
         The two `flatten` lines may need to be uncommented if we want to use
         this for array input.
@@ -123,7 +127,7 @@ class WFC3IRForwardGrismDispersion(Model):
         return model(x, y, x0, y0, order)
 
 
-class WFC3IRBackwardGrismDispersion(Model):
+class AstrogrismBackwardGrismDispersion(Model):
     """Return the dispersed pixel(s) given center x, y, lambda, and order
 
     Parameters
@@ -159,7 +163,7 @@ class WFC3IRBackwardGrismDispersion(Model):
 
     def __init__(self, orders, lmodels=None, xmodels=None,
                  ymodels=None, theta=None, name=None, meta=None,
-                 interpolate_t=False):
+                 interpolate_t=False, l_unit="micron"):
         self._order_mapping = {int(k): v for v, k in enumerate(orders)}
         self.xmodels = xmodels
         # TODO: Raise a warning if no inverse transform is possible (for example
@@ -169,10 +173,11 @@ class WFC3IRBackwardGrismDispersion(Model):
         self.orders = orders
         self.theta = theta
         self.interpolate_t = interpolate_t
+        self.l_unit = l_unit
         meta = {"orders": orders}
         if name is None:
-            name = 'wfc3ir_backward_grism_dispersion'
-        super(WFC3IRBackwardGrismDispersion, self).__init__(name=name,
+            name = 'astrogrism_backward_grism_dispersion'
+        super(AstrogrismBackwardGrismDispersion, self).__init__(name=name,
                                                             meta=meta)
         self.inputs = ("x", "y", "wavelength", "order")
         self.outputs = ("x", "y", "x0", "y0", "order")
@@ -198,7 +203,7 @@ class WFC3IRBackwardGrismDispersion(Model):
         Notes
         -----
         I kept the potential for rotation from NIRISS, unsure if it's actually
-        needed/useful for WFC3. Original note:
+        needed/useful for HST instruments. Original note:
 
         There's spatial dependence for NIRISS so the forward transform
         dependes on x,y as well as the filter wheel rotation. Theta is
@@ -209,6 +214,13 @@ class WFC3IRBackwardGrismDispersion(Model):
             return None
         if np.any(wavelength < 0):
             raise ValueError("Wavelength should be greater than zero")
+
+        # Check if wavelength is in unit expected (if Quantity)
+        if isinstance(wavelength, u.Quantity):
+            wavelength = wavelength.to(self.l_unit)
+        else:
+            warnings.warn(f"Assuming input wavelength is in {self.l_unit}. To "
+                          "specify wavelength unit, input an astropy Quantity.")
 
         try:
             iorder = self._order_mapping[int(order.flatten()[0])]
