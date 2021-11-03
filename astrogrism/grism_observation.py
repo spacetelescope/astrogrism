@@ -7,8 +7,8 @@ from gwcs import coordinate_frames as cf
 import numpy as np
 import pathlib
 
-from astrogrism.HST.transform_models import (WFC3IRForwardGrismDispersion,
-                                             WFC3IRBackwardGrismDispersion)
+from astrogrism.HST.transform_models import (AstrogrismForwardGrismDispersion,
+                                             AstrogrismBackwardGrismDispersion)
 from astrogrism.HST.dispersion_models import DISPXY_Extension
 
 pkg_dir = pathlib.Path(__file__).parent.absolute()
@@ -65,7 +65,6 @@ class GrismObs():
             self.filter = filter
 
         # Build GWCS geometric transform pipeline
-        print(self.instrument)
         if self.filter in ("G280", "G800L"):
             # Need to build transforms for both channels of WFC3 UVIS and ACS WFC
             self.geometric_transforms = {}
@@ -92,7 +91,10 @@ class GrismObs():
         # Get paths to premade configuration files
         config_dir = pkg_dir / 'config' / self.telescope
 
-        # Account for additional specifications needed for WFC3 instrument and filter
+        # Most of the supported grisms require Microns for wavelength units
+        l_unit = "micron"
+
+        # Account for additional specifications needed for instrument and filter
         if self.telescope == "HST":
             if self.filter in ("G102", "G141"):
                 instrument = self.instrument + "_IR"
@@ -100,6 +102,7 @@ class GrismObs():
             elif self.filter == "G280":
                 instrument = f"{self.instrument}_UVIS"
                 filter = f"{self.filter}_CCD{channel}"
+                l_unit = "Angstrom"
             elif self.filter == "G800L":
                 instrument = "ACS_WFC"
                 filter = f"{self.filter}_CCD{channel}"
@@ -128,23 +131,26 @@ class GrismObs():
         gdetector = cf.Frame2D(name='grism_detector',
                                axes_order=(0, 1),
                                unit=(u.pix, u.pix))
-        det2det = WFC3IRForwardGrismDispersion(orders,
-                                               lmodels=displ,
-                                               xmodels=invdispx,
-                                               ymodels=dispy)
+        det2det = AstrogrismForwardGrismDispersion(orders,
+                                                   lmodels=displ,
+                                                   xmodels=invdispx,
+                                                   ymodels=dispy,
+                                                   l_unit=l_unit)
         # TODO: Decide where to raise a warning if we can't do the backward
         # grism transformation (UVIS, at least for now).
         if invdispl is not None:
-            det2det.inverse = WFC3IRBackwardGrismDispersion(orders,
-                                                            lmodels=invdispl,
-                                                            xmodels=dispx,
-                                                            ymodels=dispy)
+            det2det.inverse = AstrogrismBackwardGrismDispersion(orders,
+                                                                lmodels=invdispl,
+                                                                xmodels=dispx,
+                                                                ymodels=dispy,
+                                                                l_unit=l_unit)
         else:
-            det2det.inverse = WFC3IRBackwardGrismDispersion(orders,
-                                                            lmodels=displ,
-                                                            xmodels=dispx,
-                                                            ymodels=dispy,
-                                                            interpolate_t=True)
+            det2det.inverse = AstrogrismBackwardGrismDispersion(orders,
+                                                                lmodels=displ,
+                                                                xmodels=dispx,
+                                                                ymodels=dispy,
+                                                                interpolate_t=True,
+                                                                l_unit=l_unit)
 
         grism_pipeline = [(gdetector, det2det)]
 

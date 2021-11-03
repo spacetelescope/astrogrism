@@ -2,6 +2,8 @@ from astrogrism import GrismObs
 
 import pathlib
 import numpy as np
+import astropy.units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 # TODO: Switch to importlib
 test_dir = pathlib.Path(__file__).parent.absolute()
@@ -29,7 +31,7 @@ def test_wfc3_g280_roundtrip():
     np.testing.assert_allclose(d2g2(1000.0, 1500.0, 5000, 1.0), d2g2_expected, atol=5e-2)
 
     # Now test transforming all the way end to end
-    world_ref = (206.4318333333, 26.41859444444, 4000, 1.0)
+    world_ref = (206.4318333333, 26.41859444444, 4000*u.AA, 1.0)
 
     g2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("grism_detector", "world")
     w2g1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "grism_detector")
@@ -46,5 +48,9 @@ def test_wfc3_g280_roundtrip():
     np.testing.assert_allclose(w2g2(*world_ref), w2g2_expected, atol=5e-5)
 
     # Use rtol here because the wavelength doesn't round trip perfectly
-    np.testing.assert_allclose(g2w1(*w2g1_expected), world_ref, rtol=0.005)
-    np.testing.assert_allclose(g2w2(*w2g2_expected), world_ref, rtol=0.005)
+    g2w1_res = g2w1(*w2g1_expected)
+    g2w2_res = g2w2(*w2g2_expected)
+    [assert_quantity_allclose(g2w1_res[i], world_ref[i], rtol=0.005) for i in
+     range(len(world_ref))]
+    [assert_quantity_allclose(g2w2_res[i], world_ref[i], rtol=0.005) for i in
+     range(len(world_ref))]

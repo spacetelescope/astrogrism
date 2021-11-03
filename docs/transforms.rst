@@ -12,9 +12,10 @@ each frame are listed below - note that the input needed to go from e.g. the
 world to the direct detector frame is the same as the output of the transform
 in the other direction, e.g. from the direct detector to the world frame.
 
-Future work will allow astropy ``Quantity`` input and convert units automatically
-if needed, but currently there are specific requirements for the units of the 
-inputs. 
+Astropy ``Quantity`` input is currently accepted for wavelength, which will 
+be converted automatically internally to the necessary units in that case. 
+Currently, sky coordinates (right ascension and declination) must be input 
+as decimal degrees. 
 
 
 World
@@ -24,7 +25,10 @@ Input/Output: ``(right ascension, declination, wavelength, order)``
 
 The ``right ascension`` and ``declination`` are specified in degrees. The 
 ``wavelength`` units depend on instrument: Micron for ACS and WFC3 IR, 
-Angstrom for WFC3 UVIS. The dispersion ``order`` is a unitless integer. 
+Angstrom for WFC3 UVIS. If the wavelength is input as an astropy ``Quantity``, 
+it will be automatically converted to the correct units, otherwise (if a float
+is input) it must be in the correct units. The dispersion ``order`` is a 
+unitless integer. 
 
 Direct Detector
 ---------------
