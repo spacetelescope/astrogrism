@@ -103,7 +103,7 @@ class GrismObs():
             elif self.filter == "G280":
                 instrument = f"{self.instrument}_UVIS"
                 filter = f"{self.filter}_CCD{channel}"
-                l_unit = "angstrom"
+                l_unit = "Angstrom"
             elif self.filter == "G800L":
                 instrument = "ACS_WFC"
                 filter = f"{self.filter}_CCD{channel}"
@@ -135,7 +135,8 @@ class GrismObs():
         det2det = AstrogrismForwardGrismDispersion(orders,
                                                    lmodels=displ,
                                                    xmodels=invdispx,
-                                                   ymodels=dispy)
+                                                   ymodels=dispy,
+                                                   l_unit=l_unit)
         # TODO: Decide where to raise a warning if we can't do the backward
         # grism transformation (UVIS, at least for now).
         if invdispl is not None:
