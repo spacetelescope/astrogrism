@@ -124,7 +124,8 @@ class AstrogrismForwardGrismDispersion(Model):
             model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
                                                       wavelength & Const1D(order))
 
-        return model(x, y, x0, y0, order)
+        x_out, y_out, wavelength, order =  model(x, y, x0, y0, order)
+        return x_out, y_out, wavelength*u.Unit(self.l_unit), order
 
 
 class AstrogrismBackwardGrismDispersion(Model):
