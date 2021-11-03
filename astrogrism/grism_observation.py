@@ -111,7 +111,6 @@ class GrismObs():
             instrument = self.instrument
             filter = self.filter
 
-
         sip_file = config_dir / "{}_distortion.fits".format(instrument)
         spec_wcs_file = config_dir / "{}_{}_specwcs.asdf".format(
                                                        self.instrument,
@@ -134,24 +133,24 @@ class GrismObs():
                                axes_order=(0, 1),
                                unit=(u.pix, u.pix))
         det2det = AstrogrismForwardGrismDispersion(orders,
-                                               lmodels=displ,
-                                               xmodels=invdispx,
-                                               ymodels=dispy)
+                                                   lmodels=displ,
+                                                   xmodels=invdispx,
+                                                   ymodels=dispy)
         # TODO: Decide where to raise a warning if we can't do the backward
         # grism transformation (UVIS, at least for now).
         if invdispl is not None:
             det2det.inverse = AstrogrismBackwardGrismDispersion(orders,
-                                                            lmodels=invdispl,
-                                                            xmodels=dispx,
-                                                            ymodels=dispy,
-                                                            l_unit=l_unit)
+                                                                lmodels=invdispl,
+                                                                xmodels=dispx,
+                                                                ymodels=dispy,
+                                                                l_unit=l_unit)
         else:
             det2det.inverse = AstrogrismBackwardGrismDispersion(orders,
-                                                            lmodels=displ,
-                                                            xmodels=dispx,
-                                                            ymodels=dispy,
-                                                            interpolate_t=True,
-                                                            l_unit=l_unit)
+                                                                lmodels=displ,
+                                                                xmodels=dispx,
+                                                                ymodels=dispy,
+                                                                interpolate_t=True,
+                                                                l_unit=l_unit)
 
         grism_pipeline = [(gdetector, det2det)]
 

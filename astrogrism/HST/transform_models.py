@@ -56,7 +56,7 @@ class AstrogrismForwardGrismDispersion(Model):
         if name is None:
             name = 'astrogrism_forward_grism_dispersion'
         super(AstrogrismForwardGrismDispersion, self).__init__(name=name,
-                                                           meta=meta)
+                                                               meta=meta)
         # starts with the backwards pixel and calculates the forward pixel
         self.inputs = ("x", "y", "x0", "y0", "order")
         self.outputs = ("x", "y", "wavelength", "order")
@@ -124,7 +124,7 @@ class AstrogrismForwardGrismDispersion(Model):
             model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
                                                       wavelength & Const1D(order))
 
-        x_out, y_out, wavelength, order =  model(x, y, x0, y0, order)
+        x_out, y_out, wavelength, order = model(x, y, x0, y0, order)
         return x_out, y_out, wavelength*u.Unit(self.l_unit), order
 
 
@@ -179,7 +179,7 @@ class AstrogrismBackwardGrismDispersion(Model):
         if name is None:
             name = 'astrogrism_backward_grism_dispersion'
         super(AstrogrismBackwardGrismDispersion, self).__init__(name=name,
-                                                            meta=meta)
+                                                                meta=meta)
         self.inputs = ("x", "y", "wavelength", "order")
         self.outputs = ("x", "y", "x0", "y0", "order")
 
