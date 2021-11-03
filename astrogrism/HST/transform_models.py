@@ -218,7 +218,7 @@ class AstrogrismBackwardGrismDispersion(Model):
 
         # Check if wavelength is in unit expected (if Quantity)
         if isinstance(wavelength, u.Quantity):
-            wavelength = wavelength.to(self.l_unit)
+            wavelength = wavelength.to(self.l_unit).value
         else:
             warnings.warn(f"Assuming input wavelength is in {self.l_unit}. To "
                           "specify wavelength unit, input an astropy Quantity.")

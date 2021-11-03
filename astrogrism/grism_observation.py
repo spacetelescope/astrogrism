@@ -65,7 +65,6 @@ class GrismObs():
             self.filter = filter
 
         # Build GWCS geometric transform pipeline
-        print(self.instrument)
         if self.filter in ("G280", "G800L"):
             # Need to build transforms for both channels of WFC3 UVIS and ACS WFC
             self.geometric_transforms = {}

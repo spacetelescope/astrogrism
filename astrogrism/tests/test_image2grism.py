@@ -3,7 +3,9 @@ import tempfile
 from zipfile import ZipFile
 
 from astrogrism import GrismObs
+import astropy.units as u
 from astropy.utils.data import download_file
+from astropy.tests.helper import assert_quantity_allclose
 import grismconf
 import numpy as np
 import pytest
@@ -50,7 +52,7 @@ def test_wfc3_grismconf(grism, grism_image):
     xoffsets = C.DISPX('+1', x_center, y_center, t)
     yoffsets = C.DISPY('+1', x_center, y_center, t)
     # Grab corresponding wavelengths
-    grismconf_wavelengths = C.DISPL('+1', x_center, y_center, t)/1e4
+    grismconf_wavelengths = C.DISPL('+1', x_center, y_center, t)*u.AA
     # Calculate dispersed Xs and Ys
     grismconf_x = xoffsets+x_center
     grismconf_y = yoffsets+y_center
@@ -71,36 +73,39 @@ def test_wfc3_grismconf(grism, grism_image):
                                          astrogrism_x,
                                          astrogrism_y,
                                          grism_image)
-    np.testing.assert_allclose(roundtrip_wavelengths, grismconf_wavelengths)
+    assert_quantity_allclose(roundtrip_wavelengths, grismconf_wavelengths)
 
 
 def _image2grism(x_center, y_center, wavelengths, grism_file=None):
     if not grism_file:
         raise NotImplementedError("Grism FLT File is required for now")
+
     grismobs = GrismObs(grism_file)
     image2grism = grismobs.geometric_transforms.get_transform('detector',
                                                               'grism_detector')
     x, y = list(), list()
     for val in wavelengths:
-        dispersion = image2grism.evaluate(x_center,
-                                          y_center,
-                                          wavelength=val,
-                                          order=1)
+        print(f"Val: {val}, x_cen: {x_center}, y_cen: {y_center}")
+        dispersion = image2grism.evaluate(x_center, y_center, val, 1)
         x.append(dispersion[0])
         y.append(dispersion[1])
+
     return x, y
 
 
 def _grism2image(x_center, y_center, x_dispersion, y_dispersion, grism_file=None):
     if not grism_file:
         raise NotImplementedError("Grism FLT File is required for now")
+
     grismobs = GrismObs(grism_file)
     grism2image = grismobs.geometric_transforms.get_transform('grism_detector',
                                                               'detector')
     if len(x_dispersion) != len(y_dispersion):
         raise AttributeError("Non-equal quantities of coordinates provided")
+
     wavelengths = list()
     for x, y in zip(x_dispersion, y_dispersion):
         _, _, wavelength, _ = grism2image.evaluate(x, y, x0=x_center, y0=y_center, order=1)
         wavelengths.append(wavelength)
+
     return wavelengths
