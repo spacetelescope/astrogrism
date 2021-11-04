@@ -1,4 +1,4 @@
-Changes included in this version
---------------------------------
+v1.0.0
+======
 
-Edit this template to detail updates to the codebase
+- Release version 1.0.0 with support for HST geometric transforms
