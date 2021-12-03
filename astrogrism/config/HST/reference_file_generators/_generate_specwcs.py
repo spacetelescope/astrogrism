@@ -1,3 +1,4 @@
+from ast import literal_eval as eval
 import datetime
 import re
 import numpy as np
