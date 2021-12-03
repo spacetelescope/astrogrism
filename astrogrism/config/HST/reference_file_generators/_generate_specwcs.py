@@ -380,7 +380,7 @@ def create_grism_specwcs(conffile="",
         dispy.append(ymodel)
         try:
             inv_ymodel = DISPXY_Model(e, wy, inv=True)
-            invdispy.append(ymodel)
+            invdispy.append(inv_ymodel)
         except Exception:
             invdispy.append(None)
 
