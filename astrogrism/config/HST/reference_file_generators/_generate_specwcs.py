@@ -165,8 +165,7 @@ def create_grism_specwcs(conffile="",
                          direct_filter=None,
                          author="STScI",
                          history="",
-                         outname=None,
-                         wave_units='Microns'):
+                         outname=None):
     """
     Note: This code is shamelessly stolen from the jwreftools package
     (see https://github.com/spacetelescope/jwreftools/) and adapted for use
@@ -238,10 +237,15 @@ def create_grism_specwcs(conffile="",
 
     if pupil in ("G102", "G141"):
         channel = "IR"
+        wave_units = u.AA
     elif pupil == "G280":
         channel = "UVIS"
+        wave_units = u.micron
     elif pupil == "G800L":
         channel = "WFC"
+        wave_units = u.micron
+    else:
+        raise NotImplementedError("Only G102, G141, G280, G800L Grisms supported, not " + str(pupil))
 
     ref_kw = common_reference_file_keywords(reftype="specwcs",
                                             title=f"HST {channel} Grism Parameters",
@@ -320,12 +324,12 @@ def create_grism_specwcs(conffile="",
     dispy = []
 
     for order in orders:
-        # convert the displ wavelengths to microns if desired
-        if wave_units.lower() == "microns":
-            l_coeffs = np.array(beamdict[order]['DISPL']) / 10000.
-        elif wave_units.lower() == "angstrom":
-            l_coeffs = np.array(beamdict[order]['DISPL'])
-
+        # convert the displ wavelengths from Angstroms (assumed default)
+        # to microns for not IR grisms G800L and G280
+        l_coeffs = np.array(beamdict[order]['DISPL'])
+        if wave_units == u.micron:
+            l_coeffs = (l_coeffs * u.AA).to_value(u.micron)
+        
         # create polynomials using the coefficients of each order
 
         # This holds the wavelength lookup coeffs
