@@ -240,6 +240,8 @@ def create_grism_specwcs(conffile="",
         channel = "IR"
     elif pupil == "G280":
         channel = "UVIS"
+    elif pupil == "G800L":
+        channel = "WFC"
 
     ref_kw = common_reference_file_keywords(reftype="specwcs",
                                             title=f"HST {channel} Grism Parameters",
@@ -356,8 +358,12 @@ def create_grism_specwcs(conffile="",
         e = beamdict[order]['DISPX']
         xmodel = DISPXY_Model(e, wx)
         dispx.append(xmodel)
-        inv_xmodel = DISPXY_Model(e, wx, inv=True)
-        invdispx.append(inv_xmodel)
+        try:
+            inv_xmodel = DISPXY_Model(e, wx, inv=True)
+            invdispx.append(inv_xmodel)
+        except:
+            # Interpolate x inverse
+            invdispx.append(None)
 
         # This holds the y coefficients, for the C grism, this model is
         # the INVDISPY, returning t, for the R grism, this model is the DISPY
