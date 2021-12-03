@@ -37,7 +37,6 @@ def dict_from_file(filename):
     dictionary of deciphered keys and values
 
     """
-    token = '\s+|(?<!\d)[,](?!\d)'  # noqa: W605 #  nosec
     # starts with a letter
     letters = re.compile("(^[a-zA-Z])")  # noqa: W605
     numbers = re.compile("(^(?:[+\-])?(?:\d*)(?:\.)?(?:\d*)?(?:[eE][+\-]?\d*$)?)")  # noqa: W605
@@ -53,7 +52,7 @@ def dict_from_file(filename):
         key = None
         if not empty.match(line):
             if letters.match(line):
-                pair = re.split(token, line.strip())
+                pair = re.split('\s+|(?<!\d)[,](?!\d)', line.strip())  # noqa: W605
                 if len(pair) == 2:  # key and value exist
                     key = pair[0]  # first item is the key
                     val = pair[1]  # second item is the value
