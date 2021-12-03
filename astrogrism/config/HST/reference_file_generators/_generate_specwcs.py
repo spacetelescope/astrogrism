@@ -37,7 +37,7 @@ def dict_from_file(filename):
     dictionary of deciphered keys and values
 
     """
-    token = '\s+|(?<!\d)[,](?!\d)'  # noqa: W605
+    token = '\s+|(?<!\d)[,](?!\d)'  # noqa: W605 #  nosec
     # starts with a letter
     letters = re.compile("(^[a-zA-Z])")  # noqa: W605
     numbers = re.compile("(^(?:[+\-])?(?:\d*)(?:\.)?(?:\d*)?(?:[eE][+\-]?\d*$)?)")  # noqa: W605
