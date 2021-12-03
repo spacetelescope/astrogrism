@@ -4,8 +4,6 @@
 # I'll attempt to break down the following code into its individual components,
 # most derived from pysiaf
 
-from asdf import AsdfFile
-from astropy.io.fits import hdu
 from astropy.modeling.models import Polynomial2D, Mapping, Shift, SIP
 import astropy.units as u
 from astropy.io import fits
@@ -14,14 +12,11 @@ import numpy as np
 
 from stdatamodels import util
 
-#import read_siaf_table
 
 def get_distortion_coeffs(degree, filter_info):
     """Do this with the grism file header input instead"""
     a_coeffs = {}
     b_coeffs = {}
-    ap_coeffs = {}
-    bp_coeffs = {}
 
     for key in filter_info:
         if key[0:2] == "A_" or key[0:2] == "B_":
@@ -33,7 +28,6 @@ def get_distortion_coeffs(degree, filter_info):
                 a_coeffs[new_key] = filter_info[key]
             elif split_key[0] == "B":
                 b_coeffs[new_key] = filter_info[key]
-
 
     return a_coeffs, b_coeffs
 
@@ -58,43 +52,44 @@ def get_SIP_Model():
     # Create dictionaries of distortion coefficients
     coeffs = {
         'A': {
-            'pattern': re.compile("A_\d_\d"),
+            'pattern': re.compile("A_\d_\d"),  # noqa: W605
             'matching_coeffs': dict()
         },
-        'B':{
-            'pattern': re.compile("B_\d_\d"),
+        'B': {
+            'pattern': re.compile("B_\d_\d"),  # noqa: W605
             'matching_coeffs': dict()
         },
         'AP': {
-            'pattern': re.compile("AP_\d_\d"),
+            'pattern': re.compile("AP_\d_\d"),  # noqa: W605
             'matching_coeffs': dict()
         },
         'BP': {
-            'pattern': re.compile("AB_\d_\d"),
+            'pattern': re.compile("AB_\d_\d"),  # noqa: W605
             'matching_coeffs': dict()
-        }        
+        }
     }
 
     for key in hduIRHeader:
         for coeff in coeffs.values():
             if coeff['pattern'].match(key):
                 coeff['matching_coeffs'][key] = hduIRHeader[key]
-    
-    SIP_model = SIP(crpix=[
-                    hduIRHeader['CRPIX1'],
-                    hduIRHeader['CRPIX2']
-                ],
-                a_order=hduIRHeader['A_ORDER'],
-                a_coeff=coeffs['A']['matching_coeffs'],
-                b_order=hduIRHeader['B_ORDER'],
-                b_coeff=coeffs['B']['matching_coeffs'],
-                ap_order=hduIRHeader['AP_ORDER'],
-                ap_coeff=coeffs['AP']['matching_coeffs'],
-                bp_order=hduIRHeader['BP_ORDER'],
-                bp_coeff=coeffs['BP']['matching_coeffs']
 
-    )
+    SIP_model = SIP(crpix=[
+                        hduIRHeader['CRPIX1'],
+                        hduIRHeader['CRPIX2']
+                    ],
+                    a_order=hduIRHeader['A_ORDER'],
+                    a_coeff=coeffs['A']['matching_coeffs'],
+                    b_order=hduIRHeader['B_ORDER'],
+                    b_coeff=coeffs['B']['matching_coeffs'],
+                    ap_order=hduIRHeader['AP_ORDER'],
+                    ap_coeff=coeffs['AP']['matching_coeffs'],
+                    bp_order=hduIRHeader['BP_ORDER'],
+                    bp_coeff=coeffs['BP']['matching_coeffs']
+
+                    )
     return SIP_model
+
 
 def v2v3_model(from_sys, to_sys, par, angle):
     """
@@ -102,7 +97,7 @@ def v2v3_model(from_sys, to_sys, par, angle):
     for the undistorted ("ideal") to V2V3 coordinate translation
     """
     if from_sys != 'v2v3' and to_sys != 'v2v3':
-        raise ValueError("This function is designed to generate the transformation either to or from V2V3.")
+        raise ValueError("Only transformation either to or from V2V3 are supported")
 
     # Cast the transform functions as 1st order polynomials
     xc = {}
@@ -119,7 +114,7 @@ def v2v3_model(from_sys, to_sys, par, angle):
         yc['c1_0'] = np.sin(angle)
         yc['c0_1'] = np.cos(angle)
 
-    #0,0 coeff should never be used.
+    # 0,0 coeff should never be used.
     xc['c0_0'] = 0
     yc['c0_0'] = 0
 
@@ -129,10 +124,15 @@ def v2v3_model(from_sys, to_sys, par, angle):
     return xmodel, ymodel
 
 
-#https://github.com/spacetelescope/nircam_calib/blob/master/nircam_calib/reffile_creation/pipeline/distortion/nircam_distortion_reffiles_from_pysiaf.py#L37
-def create_distortion(outname, sci_pupil,
-                             sci_subarr, sci_exptype, detector="None", history_entry="Astrogrism HST Distortion", save_to_asdf=False):
+def create_distortion(outname,
+                      sci_pupil,
+                      sci_subarr,
+                      sci_exptype,
+                      detector="None",
+                      history_entry="Astrogrism HST Distortion",
+                      save_to_asdf=False):
     """
+    https://github.com/spacetelescope/nircam_calib/blob/master/nircam_calib/reffile_creation/pipeline/distortion/nircam_distortion_reffiles_from_pysiaf.py#L37
     Create an asdf reference file with all distortion components for the NIRCam imager.
     NOTE: The IDT has not provided any distortion information. The files are constructed
     using ISIM transformations provided/(computed?) by the TEL team which they use to
@@ -153,61 +153,37 @@ def create_distortion(outname, sci_pupil,
     from astropy.utils.data import download_file
 
     # Raw FLT Grism image file with encoded SIP Distortion Coeffients
-    fn = download_file('https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits', cache=True)
+    fn = download_file('https://github.com/npirzkal/aXe_WFC3_Cookbook/raw/main/cookbook_data/G141/ib6o23rsq_flt.fits', cache=True)  # noqa: E501
     grism_image_hdulist = fits.open(fn)
     distortion_info = grism_image_hdulist['SCI'].header
 
     degree = 4  # WFC3 Distortion is fourth degree
 
     # From Bryan Hilbert:
-    #   The parity term is just an indicator of the relationship between the detector y axis and the “science” y axis.
-    #   A parity of -1 means that the y axes of the two systems run in opposite directions... A value of 1 indicates no flip.
+    #   The parity term is just an indicator of the relationship between the detector y axis
+    #   and the “science” y axis. A parity of -1 means that the y axes of the two systems run
+    #   in opposite directions... A value of 1 indicates no flip.
     # From Colin Cox:
     #   ... for WFC3 it is always -1 so maybe people gave up mentioning it.
     parity = -1
 
-    #full_aperture = detector + '_' + aperture
-
-    # Get Siaf instance for detector/aperture
-    #inst_siaf = pysiaf.Siaf('nircam')
-    #siaf = inst_siaf[full_aperture]
-
     # *****************************************************
     # "Forward' transformations. science --> ideal --> V2V3
 
-    # With IDCTAB file
-    #xcoeffs, ycoeffs = get_distortion_coeffs(degree, wfc3_filter_info)
     # With SIP coefficients from the FITS header
     xcoeffs, ycoeffs = get_distortion_coeffs(degree, distortion_info)
 
-    sci2idlx = Polynomial2D(degree, **xcoeffs)
-    sci2idly = Polynomial2D(degree, **ycoeffs)
-
     # Get info for ideal -> v2v3 or v2v3 -> ideal model
-    #idl2v2v3x, idl2v2v3y = v2v3_model('ideal', 'v2v3', parity, np.radians(wfc3_distortion_file[1].data[wfc3_distortion_file[1].data['FILTER'] == filter]['THETA'][0]))
-
-    idl2v2v3x, idl2v2v3y = v2v3_model('ideal', 'v2v3', parity, np.radians(distortion_info["IDCTHETA"]))
-
-    '''
-    # *****************************************************
-    # 'Reverse' transformations. V2V3 --> ideal --> science
-    xcoeffs, ycoeffs = get_distortion_coeffs('Idl2Sci', siaf)
-
-    idl2scix = Polynomial2D(degree, **xcoeffs)
-    idl2sciy = Polynomial2D(degree, **ycoeffs)
-
-    # Get info for ideal -> v2v3 or v2v3 -> ideal model
-    v2v32idlx, v2v32idly = v2v3_model('v2v3', 'ideal', parity, np.radians(wfc3_distortion_file['THETA']))
-    '''
+    idl2v2v3x, idl2v2v3y = v2v3_model('ideal',
+                                      'v2v3',
+                                      parity,
+                                      np.radians(distortion_info["IDCTHETA"]))
 
     # Now create a compound model for each with the appropriate inverse
     # Inverse polynomials were removed in favor of using GWCS' numerical inverse capabilities
-    #sci2idl = Mapping([0, 1, 0, 1]) | sci2idlx & sci2idly
     sci2idl = get_SIP_Model()
-    #sci2idl.inverse = Mapping([0, 1, 0, 1]) | idl2scix & idl2sciy
 
     idl2v2v3 = Mapping([0, 1, 0, 1]) | idl2v2v3x & idl2v2v3y
-    #idl2v2v3.inverse = Mapping([0, 1, 0, 1]) | v2v32idlx & v2v32idly
 
     # Now string the models together to make a single transformation
 
@@ -224,15 +200,11 @@ def create_distortion(outname, sci_pupil,
     # 1-indexed
 
     # Find the distance between (0,0) and the reference location
-    #xshift = Shift(wfc3_filter_info['XREF'])
-    #yshift = Shift(wfc3_filter_info['YREF'])
     xshift = Shift(distortion_info['IDCXREF'])
     yshift = Shift(distortion_info['IDCYREF'])
 
     # Finally, we need to shift by the v2,v3 value of the reference
     # location in order to get to absolute v2,v3 coordinates
-    #v2shift = Shift(wfc3_filter_info['V2REF'])
-    #v3shift = Shift(wfc3_filter_info['V3REF'])
     v2shift = Shift(distortion_info['IDCV2REF'])
     v3shift = Shift(distortion_info['IDCV3REF'])
 
@@ -248,7 +220,7 @@ def create_distortion(outname, sci_pupil,
                         output_units=u.arcsec)
 
     if save_to_asdf:
-        #Populate metadata
+        # Populate metadata
 
         # Keyword values in science data to which this file should
         # be applied
@@ -272,13 +244,13 @@ def create_distortion(outname, sci_pupil,
         d.meta.title = "WFC3 Distortion"
         d.meta.instrument.name = "WFC3"
         d.meta.instrument.module = detector[-2]
-        
+
         numdet = detector[-1]
         d.meta.instrument.channel = "LONG" if numdet == '5' else "SHORT"
         # In the reference file headers, we need to switch NRCA5 to
         # NRCALONG, and same for module B.
         d.meta.instrument.detector = (detector[0:4] + 'LONG') if numdet == 5 else detector
-        
+
         d.meta.telescope = 'HST'
         d.meta.subarray.name = 'FULL'
         d.meta.pedigree = 'GROUND'
@@ -294,36 +266,14 @@ def create_distortion(outname, sci_pupil,
 
         # Create initial HISTORY ENTRY
         sdict = {'name': 'nircam_distortion_reffiles_from_pysiaf.py',
-                'author': 'B.Hilbert',
-                'homepage': 'https://github.com/spacetelescope/jwreftools',
-                'version': '0.8'}
+                 'author': 'B.Hilbert',
+                 'homepage': 'https://github.com/spacetelescope/jwreftools',
+                 'version': '0.8'}
 
         entry = util.create_history_entry(history_entry, software=sdict)
         d.history = [entry]
-
-        #Create additional HISTORY entries
-        #entry2 = util.create_history_entry(history_2)
-        #d.history.append(entry2)
 
         d.save(outname)
         print("Output saved to {}".format(outname))
     else:
         return d
-
-'''
-# Sample Invocation
-# https://github.com/spacetelescope/nircam_calib/blob/master/nircam_calib/reffile_creation/pipeline/distortion/make_all_imaging_distortion_reffiles_from_pysiaf.py#L49
-# SW = "Short wavelength", lw = "Long Wavelength"
-detector = 'WFC3IR'
-#apname = 'FULL'
-outname = '{}_distortion.asdf'.format(detector)# + '_' + apname)
-pupil = ['NRC_IMAGE', 'NRC_TSIMAGE', 'NRC_FLAT', 'NRC_LED',
-         'NRC_WFSC', 'NRC_TACQ', 'NRC_TACONFIRM', 'NRC_FOCUS',
-         'NRC_DARK', 'NRC_WFSS', 'NRC_TSGRISM', 'NRC_GRISM']
-subarr =['GENERIC']
-exp_type = pupil
-hist = "A Random Description"
-filter = 'F105W'
-#ref.create_nircam_distortion(detector, apname, outname, pupil, subarr, exp_type, hist)
-create_wfc3_distortion(detector, outname, pupil, subarr, exp_type, hist, filter)
-'''
