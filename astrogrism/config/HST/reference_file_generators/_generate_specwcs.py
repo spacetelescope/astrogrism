@@ -10,6 +10,7 @@ from astrogrism.HST.dispersion_models import DISPXY_Model, DISPXY_Extension
 from ._common import common_reference_file_keywords
 from .wcs_ref_model import WFC3GrismModel
 
+
 def dict_from_file(filename):
     """Read in a file and return a named tuple of the key value pairs.
 
@@ -35,10 +36,12 @@ def dict_from_file(filename):
     dictionary of deciphered keys and values
 
     """
-    token = '\s+|(?<!\d)[,](?!\d)'
-    letters = re.compile("(^[a-zA-Z])")  # starts with a letter
-    numbers = re.compile("(^(?:[+\-])?(?:\d*)(?:\.)?(?:\d*)?(?:[eE][+\-]?\d*$)?)")
-    empty = re.compile("(^\s*$)")  # is a blank line
+    token = '\s+|(?<!\d)[,](?!\d)'  # noqa: W605
+    # starts with a letter
+    letters = re.compile("(^[a-zA-Z])")  # noqa: W605
+    numbers = re.compile("(^(?:[+\-])?(?:\d*)(?:\.)?(?:\d*)?(?:[eE][+\-]?\d*$)?)")  # noqa: W605
+    # is a blank line
+    empty = re.compile("(^\s*$)")  # noqa: W605
 
     print("\nReading {0:s}  ...".format(filename))
     with open(filename, 'r') as fh:
@@ -65,7 +68,7 @@ def dict_from_file(filename):
                     else:
                         raise ValueError("Min/max values expected for {0}"
                                          .format(key))
-                elif len(pair) > 3: # Key and many values exist (DISPX and DISPY)
+                elif len(pair) > 3:  # Key and many values exist (DISPX and DISPY)
                     key = pair[0]
                     value = []
                     for i in range(1, len(pair)):
@@ -77,7 +80,6 @@ def dict_from_file(filename):
         if key and (value is not None):
             if (("FILTER" not in key) and ("SENSITIVITY" not in key)):
                 content[key] = value
-                #print("Setting {0:s} = {1}".format(key, value))
 
     return content
 
@@ -107,8 +109,8 @@ def split_order_info(keydict):
         raise ValueError("Expected an input dictionary")
 
     # has beam name fits token
-    token = re.compile('^[a-zA-Z]*_(?:[+\-]){0,1}[a-zA-Z0-9]{0,1}_*')
-    rangekey = re.compile('^[a-zA-Z]*_[0-1]{0,1}[0-9]{1,1}$')
+    token = re.compile('^[a-zA-Z]*_(?:[+\-]){0,1}[a-zA-Z0-9]{0,1}_*')  # noqa: W605
+    rangekey = re.compile('^[a-zA-Z]*_[0-1]{0,1}[0-9]{1,1}$')  # noqa: W605
     rdict = dict()  # return dictionary
     beams = list()
 
@@ -121,7 +123,7 @@ def split_order_info(keydict):
         elif token.match(key):
             b = key.split("_")[1].upper()
             if b not in beams:
-               beams.append(b)
+                beams.append(b)
     for b in beams:
         rdict[b] = dict()
 
@@ -245,14 +247,14 @@ def create_grism_specwcs(conffile="",
         channel = "WFC"
         wave_units = u.micron
     else:
-        raise NotImplementedError("Only G102, G141, G280, G800L Grisms supported, not " + str(pupil))
+        raise NotImplementedError("G102, G141, G280, G800L Grisms supported, not " + str(pupil))
 
     ref_kw = common_reference_file_keywords(reftype="specwcs",
                                             title=f"HST {channel} Grism Parameters",
                                             description="{0:s} dispersion models".format(pupil),
                                             exp_type=f"WFC3_{channel}",
                                             author=author,
-                                            model_type=f"WFC3GrismModel",
+                                            model_type="WFC3GrismModel",
                                             fname=direct_filter,
                                             pupil=pupil,
                                             filename=outname,
@@ -283,9 +285,10 @@ def create_grism_specwcs(conffile="",
     # they currently have names like this: NIRCam.A.1st.sensitivity.fits
     # translated as inst.beam/order.param
     temp = dict()
-    etoken = re.compile("^[a-zA-Z]*_(?:[+\-]){1,1}[1,2]{1,1}")  # find beam key
+    # find beam key
+    etoken = re.compile("^[a-zA-Z]*_(?:[+\-]){1,1}[1,2]{1,1}")  # noqa: W605
     for b, bdict in beamdict.items():
-            temp[b] = dict()
+        temp[b] = dict()
 
     # add the new beam information to beamdict and remove spurious beam info
     for k in temp:
@@ -329,7 +332,7 @@ def create_grism_specwcs(conffile="",
         l_coeffs = np.array(beamdict[order]['DISPL'])
         if wave_units == u.micron:
             l_coeffs = (l_coeffs * u.AA).to_value(u.micron)
-        
+
         # create polynomials using the coefficients of each order
 
         # This holds the wavelength lookup coeffs
@@ -351,7 +354,7 @@ def create_grism_specwcs(conffile="",
                 try:
                     lmodel = DISPXY_Model(l_coeffs, 0, inv=True)
                 except ValueError:
-                    lmodel=None
+                    lmodel = None
             invdispl.append(lmodel)
 
             lmodel = DISPXY_Model(l_coeffs, 0)
@@ -365,7 +368,7 @@ def create_grism_specwcs(conffile="",
         try:
             inv_xmodel = DISPXY_Model(e, wx, inv=True)
             invdispx.append(inv_xmodel)
-        except:
+        except Exception:
             # Interpolate x inverse
             invdispx.append(None)
 
@@ -377,10 +380,8 @@ def create_grism_specwcs(conffile="",
         try:
             inv_ymodel = DISPXY_Model(e, wy, inv=True)
             invdispy.append(ymodel)
-        except:
+        except Exception:
             invdispy.append(None)
-
-
 
     # We need to register the converter for the DISPXY_Model class with asdf
     asdf.get_config().add_extension(DISPXY_Extension())
@@ -401,11 +402,12 @@ def create_grism_specwcs(conffile="",
     # so that we can look up the order with the proper index
     ref.order = [int(o) for o in beamdict]
     history = asdf.tags.core.HistoryEntry({'description': history,
-                            'time': datetime.datetime.utcnow()})
+                                           'time': datetime.datetime.utcnow()})
     software = asdf.tags.core.Software({'name': '_generate_specwcs.py',
-                         'author': author,
-                         'homepage': 'https://github.com/spacetelescope/astrogrism',
-                         'version': '1.0.0'})
+                                        'author': author,
+                                        'homepage': 'https://github.com/spacetelescope/astrogrism',
+                                        'version': '1.0.0'})
+
     history['software'] = software
     ref.history = [history]
     ref.to_asdf(outname)

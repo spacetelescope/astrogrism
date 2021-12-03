@@ -4,6 +4,7 @@ from stdatamodels.validate import ValidationWarning
 
 from jwst.datamodels import ReferenceFileModel
 
+
 class WFC3GrismModel(ReferenceFileModel):
     """
     A model for a reference file of type "specwcs" for HST IR grisms (G141 and
@@ -32,16 +33,17 @@ class WFC3GrismModel(ReferenceFileModel):
     schema_url = "http://stsci.edu/schemas/jwst_datamodel/specwcs_nircam_grism.schema"
     reftype = "specwcs"
 
-    def __init__(self, init=None,
-                       displ=None,
-                       dispx=None,
-                       dispy=None,
-                       invdispl=None,
-                       invdispx=None,
-                       invdispy=None,
-                       orders=None,
-                       channel=None,
-                       **kwargs):
+    def __init__(self,
+                 init=None,
+                 displ=None,
+                 dispx=None,
+                 dispy=None,
+                 invdispl=None,
+                 invdispx=None,
+                 invdispy=None,
+                 orders=None,
+                 channel=None,
+                 **kwargs):
         super(WFC3GrismModel, self).__init__(init=init, **kwargs)
 
         if channel is None:
