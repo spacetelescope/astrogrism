@@ -392,10 +392,10 @@ def create_grism_specwcs(conffile="",
     ref.order = [int(o) for o in beamdict]
     history = asdf.tags.core.HistoryEntry({'description': history,
                             'time': datetime.datetime.utcnow()})
-    software = asdf.tags.core.Software({'name': 'nircam_reftools.py',
+    software = asdf.tags.core.Software({'name': '_generate_specwcs.py',
                          'author': author,
-                         'homepage': 'https://github.com/spacetelescope/jwreftools',
-                         'version': '0.7.1'})
+                         'homepage': 'https://github.com/spacetelescope/astrogrism',
+                         'version': '1.0.0'})
     history['software'] = software
     ref.history = [history]
     ref.to_asdf(outname)
