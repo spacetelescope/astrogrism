@@ -75,11 +75,11 @@ class WFC3GrismModel(ReferenceFileModel):
     def validate(self):
         super(WFC3GrismModel, self).validate()
         try:
-            assert isinstance(self.meta.input_units, (str, u.NamedUnit))
-            assert isinstance(self.meta.output_units, (str, u.NamedUnit))
-            assert self.meta.instrument.name == "WFC3"
-            assert self.meta.exposure.type == f"{self.channel}_GRISM"
-            assert self.meta.reftype == self.reftype
+            assert isinstance(self.meta.input_units, (str, u.NamedUnit))  # nosec
+            assert isinstance(self.meta.output_units, (str, u.NamedUnit))  # nosec
+            assert self.meta.instrument.name == "WFC3"  # nosec
+            assert self.meta.exposure.type == f"{self.channel}_GRISM"  # nosec
+            assert self.meta.reftype == self.reftype  # nosec
         except AssertionError as errmsg:
             if self._strict_validation:
                 raise AssertionError(errmsg)
