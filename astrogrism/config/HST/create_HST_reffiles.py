@@ -6,7 +6,8 @@ from astrogrism.config.HST.reference_file_generators._generate_wavelengthrange i
 
 
 def create_reference_files(conffile, hst_grism, outpath=Path.cwd(), outbasename=None):
-    if not outbasename: outbasename = Path(conffile).name
+    if not outbasename:
+        outbasename = Path(conffile).name
     create_tsgrism_wavelengthrange(outname=str(Path(outpath) / (
                                                                 str(outbasename) +
                                                                 "_wavelengthrange.asdf")
