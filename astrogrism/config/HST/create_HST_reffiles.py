@@ -13,5 +13,5 @@ def create_reference_files(conffile, hst_grism, outpath=Path.cwd(), outbasename=
                                    )
     create_grism_specwcs(conffile=str(conffile),
                          pupil=hst_grism,
-                         outname=str(Path(outpath) / (str(outbasename) + "_wavelengthrange.asdf")))
+                         outname=str(Path(outpath) / (str(outbasename) + "_specwcs.asdf")))
     # create_distortion(detector, apname, outname, subarr, exp_type)
