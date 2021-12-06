@@ -37,13 +37,13 @@ class DISPXY_Model(Model):
         if isinstance(x, np.ndarray):
             if len(x) == 1:
                 x = float(x)
-            else:
-                raise ValueError(f"x is array: {x}")
+            #else:
+            #    raise ValueError(f"x is array: {x}")
         if isinstance(y, np.ndarray):
             if len(y) == 1:
                 y = float(y)
-            else:
-                raise ValueError(f"y is array: {y}")
+            #else:
+            #    raise ValueError(f"y is array: {y}")
 
         coeffs = {1: np.array([1]),
                   6: np.array([1, x, y, x**2, x*y, y**2])}
