@@ -20,7 +20,7 @@ def create_reference_files(conffile, hst_grism, outpath=Path.cwd(), outbasename=
     outpath : str or pathlib.PATH
         Directory where the files should be output
     outbasename : str or pathlib.PATH
-        The filename basename of the reference files to be named
+        The filename base for the generated reference files. '_[reftype].asdf will be appended to this.
     """
 
     if outbasename is None:
