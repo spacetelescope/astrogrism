@@ -14,4 +14,6 @@ def create_reference_files(conffile, hst_grism, outpath=Path.cwd(), outbasename=
 
     specwcs_filename = str(Path(outpath) / (str(outbasename) + "_specwcs.asdf"))
     create_grism_specwcs(conffile=str(conffile), pupil=hst_grism, outname=str(specwcs_filename))
+
+    # TODO: Implement distortion generation (non conf generator)
     # create_distortion(detector, apname, outname, subarr, exp_type)
