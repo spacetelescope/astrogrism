@@ -5,9 +5,13 @@ from astrogrism.config.HST.reference_file_generators._generate_wavelengthrange i
 # from astrogrism.config.HST.reference_file_generators.reference_file_generators._generate_distortion import create_distortion  # noqa
 
 
-def create_reference_files(conffile, hst_grism, outpath=Path.cwd()):
-    create_tsgrism_wavelengthrange(outname=str(Path(outpath) / "HST_wavelengthrange.asdf"))
+def create_reference_files(conffile, hst_grism, outpath=Path.cwd(), outbasename="HST"):
+    create_tsgrism_wavelengthrange(outname=str(Path(outpath) / (
+                                                                str(outbasename) +
+                                                                "_wavelengthrange.asdf")
+                                               )
+                                   )
     create_grism_specwcs(conffile=str(conffile),
                          pupil=hst_grism,
-                         outname=str(Path(outpath) / "HST_specwcs.asdf"))
+                         outname=str(Path(outpath) / (str(outbasename) + "_wavelengthrange.asdf")))
     # create_distortion(detector, apname, outname, subarr, exp_type)
