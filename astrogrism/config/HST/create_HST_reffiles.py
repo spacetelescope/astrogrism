@@ -8,7 +8,7 @@ from astrogrism.config.HST.reference_file_generators._generate_wavelengthrange i
 def create_reference_files(conffile, hst_grism, outpath=Path.cwd(), outbasename=None):
     """
     Generates the HST reference files required for the GrismObs class.
-    Currently, wavelengthrange and specwcs are supported. 
+    Currently, wavelengthrange and specwcs are supported.
     Distortion addition is stil TODO
 
     Parameters
