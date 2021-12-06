@@ -6,6 +6,23 @@ from astrogrism.config.HST.reference_file_generators._generate_wavelengthrange i
 
 
 def create_reference_files(conffile, hst_grism, outpath=Path.cwd(), outbasename=None):
+    """
+    Generates the HST reference files required for the GrismObs class.
+    Currently, wavelengthrange and specwcs are supported. 
+    Distortion addition is stil TODO
+
+    Parameters
+    ----------
+    conffile : str or pathlib.PATH
+        The path to the grism's specific GRISMCONF configuration file
+    hst_grism : str
+        The specific grism to generate the configuration files for
+    outpath : str or pathlib.PATH
+        Directory where the files should be output
+    outbasename : str or pathlib.PATH
+        The filename basename of the reference files to be named
+    """
+
     if outbasename is None:
         outbasename = Path(conffile).name
 
