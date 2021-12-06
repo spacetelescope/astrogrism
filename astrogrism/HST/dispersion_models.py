@@ -34,11 +34,41 @@ class DISPXY_Model(Model):
 
         e = self.ematrix
         offset = self.offset
+        reshape_output = False
+
+        if isinstance(x, (tuple, list)):
+            x = np.array(x)
+
+        if isinstance(y, (tuple, list)):
+            y = np.array(y)
+
+        # Handle reshaping of x and y to handle arrays if needed
+        if isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
+            if x.ndim != y.ndim:
+                raise ValueError("Input x and y arrays must have same dimensionality."
+                                 "2D arrays will be used as-is, 1D arrays will be broadcast"
+                                 "together. See documentation for further detail.")
+
+            if ndim == 2:
+                if x.shape != y.shape:
+                    raise ValueError("If x and y inputs are 2D their shapes must match")
+
+                reshape_output = True
+                output_shape = x.shape
+                x = x.flatten()
+                y = y.flatten()
+
+            elif ndim == 1:
+                pass
+            else:
+                raise ValueError("Array input for x and y can only be 1 or 2 dimensional")
+
+
         if isinstance(x, np.ndarray):
             if len(x) == 1:
                 x = float(x)
-            #else:
-            #    raise ValueError(f"x is array: {x}")
+            else:
+
         if isinstance(y, np.ndarray):
             if len(y) == 1:
                 y = float(y)
@@ -62,6 +92,9 @@ class DISPXY_Model(Model):
         else:
             for i in range(0, t_order):
                 f += t**i * (np.dot(coeffs[c_order], e[i, :]))
+
+        if reshape_output:
+            f = np.reshape(f, output_shape)
 
         return f
 
