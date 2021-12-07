@@ -53,7 +53,6 @@ class DISPXY_Model(Model):
                 if x.shape != y.shape:
                     raise ValueError("If x and y inputs are 2D their shapes must match")
 
-            # TODO: create NxM matrix of x and y values
             elif x.ndim == 1:
                 mesh = np.meshgrid(x, y)
                 x = mesh[0]
@@ -93,13 +92,12 @@ class DISPXY_Model(Model):
 
         f = 0
 
-        # TODO: Need to change calculation to handle 2D coeff arrays
         if self.inv:
             f = ((t + offset - np.dot(e[0, :], coeffs[c_order])) /
                   np.dot(e[1, :], coeffs[c_order]))
         else:
             for i in range(0, t_order):
-                f += t**i * (np.dot(coeffs[c_order], e[i, :]))
+                f += t**i * (np.dot(e[i, :], coeffs[c_order]))
 
         if reshape_output:
             f = np.reshape(f, output_shape)
