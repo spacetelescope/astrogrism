@@ -49,13 +49,15 @@ class DISPXY_Model(Model):
                                  "2D arrays will be used as-is, 1D arrays will be broadcast"
                                  "together. See documentation for further detail.")
 
-            if ndim == 2:
+            if x.ndim == 2:
                 if x.shape != y.shape:
                     raise ValueError("If x and y inputs are 2D their shapes must match")
 
             # TODO: create NxM matrix of x and y values
-            elif ndim == 1:
-                pass
+            elif x.ndim == 1:
+                mesh = np.meshgrid(x, y)
+                x = mesh[0]
+                y = mesh[1]
             else:
                 raise ValueError("Array input for x and y can only be 1 or 2 dimensional")
 
@@ -76,7 +78,9 @@ class DISPXY_Model(Model):
             const = np.full(x.shape, 1)
 
         else:
-            const = 1
+            const = np.array([1])
+            x = np.array([x])
+            y = np.array([y])
 
         coeffs = {1: np.array([1]),
                   6: np.array([const, x, y, x**2, x*y, y**2])}
@@ -91,8 +95,8 @@ class DISPXY_Model(Model):
 
         # TODO: Need to change calculation to handle 2D coeff arrays
         if self.inv:
-            f = ((t + offset - np.dot(coeffs[c_order], e[0, :])) /
-                 np.dot(coeffs[c_order], e[1, :]))
+            f = ((t + offset - np.dot(e[0, :], coeffs[c_order])) /
+                  np.dot(e[1, :], coeffs[c_order]))
         else:
             for i in range(0, t_order):
                 f += t**i * (np.dot(coeffs[c_order], e[i, :]))
