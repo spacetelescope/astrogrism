@@ -86,13 +86,13 @@ class DISPXY_Model(Model):
             c_order = e.shape[1]
 
         f = 0
+        t = np.array(t)
 
         if self.inv:
             f = ((t + offset - np.dot(e[0, :], coeffs[c_order])) /
                   np.dot(e[1, :], coeffs[c_order]))
         else:
             for i in range(0, t_order):
-                print(np.dot(e[i, :], coeffs[c_order]))
                 f += np.outer(t**i, (np.dot(e[i, :], coeffs[c_order])))
                 print(f.shape)
 

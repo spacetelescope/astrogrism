@@ -109,7 +109,9 @@ class AstrogrismForwardGrismDispersion(Model):
             rotate = Rotation2D(self.theta)
             dx, dy = rotate(dx, dy)
 
+        print(dx.shape, dx)
         so = np.argsort(dx)
+        print(dx[so])
         tab = Tabular1D(dx[so], t[so], bounds_error=False, fill_value=None)
 
         dxr = astmath.SubtractUfunc()
