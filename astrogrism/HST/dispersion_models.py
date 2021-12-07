@@ -36,12 +36,6 @@ class DISPXY_Model(Model):
         offset = self.offset
         reshape_output = False
 
-        if isinstance(x, (tuple, list)):
-            x = np.array(x)
-
-        if isinstance(y, (tuple, list)):
-            y = np.array(y)
-
         # Handle reshaping of x and y to handle arrays if needed
         if isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
             if x.ndim != y.ndim:
@@ -53,33 +47,34 @@ class DISPXY_Model(Model):
                 if x.shape != y.shape:
                     raise ValueError("If x and y inputs are 2D their shapes must match")
 
-            elif x.ndim == 1:
+            # If x and y are 1D arrays, assume we need to create a meshgrid
+            elif x.ndim == 1 and x.shape != (1,) and y.shape != (1,):
                 mesh = np.meshgrid(x, y)
                 x = mesh[0]
                 y = mesh[1]
+
+            elif x.shape == (1,):
+                if y.shape == (1,):
+                    # Explicitly include this just to not forget about this case
+                    pass
+                if y.shape != (1,):
+                    x = np.full(y.shape, x[0])
+
+            elif y.shape == (1,) and x.shape != (1,):
+                y = np.full(x.shape, y[0])
+
             else:
                 raise ValueError("Array input for x and y can only be 1 or 2 dimensional")
 
-        elif isinstance(x, np.ndarray) and isinstance(y, (float, int)):
-            y = np.full(x.shape, y)
-
-        elif isinstance(y, np.ndarray) and isinstance(x, (float, int)):
-            x = np.full(y.shape, x)
 
         # x and y should be the same shape at this point if at least one was an array
-        if isinstance(x, np.ndarray):
-            if x.ndim == 2:
-                reshape_output = True
-                output_shape = x.shape
-                x = x.flatten()
-                y = y.flatten()
+        if x.ndim == 2:
+            reshape_output = True
+            output_shape = x.shape
+            x = x.flatten()
+            y = y.flatten()
 
-            const = np.full(x.shape, 1)
-
-        else:
-            const = np.array([1])
-            x = np.array([x])
-            y = np.array([y])
+        const = np.full(x.shape, 1)
 
         coeffs = {1: np.array([1]),
                   6: np.array([const, x, y, x**2, x*y, y**2])}
@@ -97,7 +92,9 @@ class DISPXY_Model(Model):
                   np.dot(e[1, :], coeffs[c_order]))
         else:
             for i in range(0, t_order):
-                f += t**i * (np.dot(e[i, :], coeffs[c_order]))
+                print(np.dot(e[i, :], coeffs[c_order]))
+                f += np.outer(t**i, (np.dot(e[i, :], coeffs[c_order])))
+                print(f.shape)
 
         if reshape_output:
             f = np.reshape(f, output_shape)

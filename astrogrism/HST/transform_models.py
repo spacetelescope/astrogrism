@@ -237,9 +237,14 @@ class AstrogrismBackwardGrismDispersion(Model):
                 l = self.lmodels[iorder].evaluate(t)
             elif self.lmodels[iorder].n_inputs == 3:
                 l = self.lmodels[iorder].evaluate(x, y, t)
-            so = np.argsort(l)
-            tab = Tabular1D(l[so], t[so], bounds_error=False, fill_value=None)
-            t = tab(wavelength)
+
+            # Loop to account for arrays
+            t_fit = []
+            for i in range(l.shape[1]):
+                so = np.argsort(l[:, i])
+                tab = Tabular1D(l[so,i], t[so], bounds_error=False, fill_value=None)
+                t_fit.append(tab(wavelength))
+            t = t_fit
         else:
             if self.lmodels[iorder].n_inputs == 1:
                 t = self.lmodels[iorder](wavelength)
