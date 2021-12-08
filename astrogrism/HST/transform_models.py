@@ -102,16 +102,14 @@ class AstrogrismForwardGrismDispersion(Model):
         ymodel = self.ymodels[iorder]
         lmodel = self.lmodels[iorder]
 
-        dx = xmodel.evaluate(x0, y0, t)
-        dy = ymodel.evaluate(x0, y0, t)
+        dx = xmodel.evaluate(x0, y0, t).flatten()
+        dy = ymodel.evaluate(x0, y0, t).flatten()
 
         if self.theta != 0.0:
             rotate = Rotation2D(self.theta)
             dx, dy = rotate(dx, dy)
 
-        print(dx.shape, dx)
         so = np.argsort(dx)
-        print(dx[so])
         tab = Tabular1D(dx[so], t[so], bounds_error=False, fill_value=None)
 
         dxr = astmath.SubtractUfunc()
