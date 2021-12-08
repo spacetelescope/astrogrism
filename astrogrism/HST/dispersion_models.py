@@ -30,41 +30,44 @@ class DISPXY_Model(Model):
         self._model_set_axis = False
 
     # Note that in the inverse case, input "t" here is actually dx or dy
-    def evaluate(self, x, y, t):
+    def evaluate(self, x, y, t, t_op = "multiply"):
 
         e = self.ematrix
         offset = self.offset
         reshape_output = False
 
         # Handle reshaping of x and y to handle arrays if needed
-        if isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
-            if x.ndim != y.ndim:
-                raise ValueError("Input x and y arrays must have same dimensionality."
-                                 "2D arrays will be used as-is, 1D arrays will be broadcast"
-                                 "together. See documentation for further detail.")
+        if x.ndim != y.ndim:
+            raise ValueError("Input x and y arrays must have same dimensionality."
+                             "2D arrays will be used as-is, 1D arrays will be broadcast"
+                             "together. See documentation for further detail.")
 
-            if x.ndim == 2:
-                if x.shape != y.shape:
-                    raise ValueError("If x and y inputs are 2D their shapes must match")
+        if x.ndim == 2:
+            if x.shape != y.shape:
+                raise ValueError("If x and y inputs are 2D their shapes must match")
 
-            # If x and y are 1D arrays, assume we need to create a meshgrid
-            elif x.ndim == 1 and x.shape != (1,) and y.shape != (1,):
-                mesh = np.meshgrid(x, y)
-                x = mesh[0]
-                y = mesh[1]
+        # If x and y are 1D arrays, assume we need to create a meshgrid
+        elif x.ndim == 1 and x.shape != (1,) and y.shape != (1,):
+            #mesh = np.meshgrid(x, y)
+            #x = mesh[0]
+            #y = mesh[1]
+            if x.shape != y.shape:
+                raise ValueError("If x and y are 1D arrays they must have the"
+                                 "same shape. See documentation for instructions"
+                                 "for dispersing a 2D region.")
 
-            elif x.shape == (1,):
-                if y.shape == (1,):
-                    # Explicitly include this just to not forget about this case
-                    pass
-                if y.shape != (1,):
-                    x = np.full(y.shape, x[0])
+        elif x.shape == (1,):
+            if y.shape == (1,):
+                # Explicitly include this just to not forget about this case
+                pass
+            if y.shape != (1,):
+                x = np.full(y.shape, x[0])
 
-            elif y.shape == (1,) and x.shape != (1,):
-                y = np.full(x.shape, y[0])
+        elif y.shape == (1,) and x.shape != (1,):
+            y = np.full(x.shape, y[0])
 
-            else:
-                raise ValueError("Array input for x and y can only be 1 or 2 dimensional")
+        else:
+            raise ValueError("Array input for x and y can only be 1 or 2 dimensional")
 
 
         # x and y should be the same shape at this point if at least one was an array
@@ -88,13 +91,19 @@ class DISPXY_Model(Model):
         f = 0
         t = np.array(t)
 
+        #print(f"e[0,:]: {e[0,:]}")
+        #print(f"coeffs: {coeffs[c_order]}")
+        #print(f"t: {t}")
+
         if self.inv:
             f = ((t + offset - np.dot(e[0, :], coeffs[c_order])) /
                   np.dot(e[1, :], coeffs[c_order]))
         else:
             for i in range(0, t_order):
-                f += np.outer(t**i, (np.dot(e[i, :], coeffs[c_order])))
-                print(f.shape)
+                if t_op == "outer":
+                    f += np.outer(t**i, (np.dot(e[i, :], coeffs[c_order])))
+                elif t_op == "multiply":
+                    f += np.multiply(t**i, (np.dot(e[i, :], coeffs[c_order])))
 
         if reshape_output:
             f = np.reshape(f, output_shape)
