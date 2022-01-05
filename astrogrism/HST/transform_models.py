@@ -102,8 +102,8 @@ class AstrogrismForwardGrismDispersion(Model):
         ymodel = self.ymodels[iorder]
         lmodel = self.lmodels[iorder]
 
-        dx = xmodel.evaluate(x0, y0, t).flatten()
-        dy = ymodel.evaluate(x0, y0, t).flatten()
+        dx = xmodel.evaluate(x0, y0, t, t_op="outer").flatten()
+        dy = ymodel.evaluate(x0, y0, t, t_op="outer").flatten()
 
         if self.theta != 0.0:
             rotate = Rotation2D(self.theta)
@@ -222,7 +222,6 @@ class AstrogrismBackwardGrismDispersion(Model):
         else:
             warnings.warn(f"Assuming input wavelength is in {self.l_unit}. To "
                           "specify wavelength unit, input an astropy Quantity.")
-
         try:
             iorder = self._order_mapping[int(order.flatten()[0])]
         except AttributeError:
@@ -236,7 +235,7 @@ class AstrogrismBackwardGrismDispersion(Model):
             if self.lmodels[iorder].n_inputs == 1:
                 l = self.lmodels[iorder].evaluate(t)
             elif self.lmodels[iorder].n_inputs == 3:
-                l = self.lmodels[iorder].evaluate(x, y, t)
+                l = self.lmodels[iorder].evaluate(x, y, t, t_op="outer")
 
             # Loop to account for arrays
             t_fit = []
@@ -244,7 +243,9 @@ class AstrogrismBackwardGrismDispersion(Model):
                 so = np.argsort(l[:, i])
                 tab = Tabular1D(l[so,i], t[so], bounds_error=False, fill_value=None)
                 t_fit.append(tab(wavelength))
-            t = t_fit
+            # tab = Tabular1D(l, t, bounds_error=False, fill_value=None)
+            # t = tab(wavelength)
+            t = np.array(t_fit).flatten()
         else:
             if self.lmodels[iorder].n_inputs == 1:
                 t = self.lmodels[iorder](wavelength)
