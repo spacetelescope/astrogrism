@@ -245,7 +245,7 @@ def create_grism_specwcs(conffile="",
         wave_units = u.micron
     elif pupil == "G800L":
         channel = "WFC"
-        wave_units = u.micron
+        wave_units = u.AA
     else:
         raise NotImplementedError("G102, G141, G280, G800L Grisms supported, not " + str(pupil))
 
