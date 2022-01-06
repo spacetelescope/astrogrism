@@ -34,20 +34,9 @@ class DISPXY_Model(Model):
 
         e = self.ematrix
         offset = self.offset
-        reshape_output = False
 
-        # Handle reshaping of x and y to handle arrays if needed
-        if x.ndim != y.ndim:
-            raise ValueError("Input x and y arrays must have same dimensionality."
-                             "2D arrays will be used as-is, 1D arrays will be broadcast"
-                             "together. See documentation for further detail.")
-
-        if x.ndim == 2:
-            if x.shape != y.shape:
-                raise ValueError("If x and y inputs are 2D their shapes must match")
-
-        # If x and y are 1D arrays, assume we need to create a meshgrid
-        elif x.ndim == 1 and x.shape != (1,) and y.shape != (1,):
+        # If x and y are 1D arrays, check that they have the same number of elements
+        if x.shape != (1,) and y.shape != (1,):
             if x.shape != y.shape:
                 raise ValueError("If x and y are 1D arrays they must have the"
                                  "same shape. See documentation for instructions"
@@ -64,14 +53,7 @@ class DISPXY_Model(Model):
             y = np.full(x.shape, y[0])
 
         else:
-            raise ValueError("Array input for x and y can only be 1 or 2 dimensional")
-
-        # x and y should be the same shape at this point if at least one was an array
-        if x.ndim == 2:
-            reshape_output = True
-            output_shape = x.shape
-            x = x.flatten()
-            y = y.flatten()
+            raise ValueError("Array input for x and y can only be 1 dimensional")
 
         const = np.full(x.shape, 1)
 
@@ -96,9 +78,6 @@ class DISPXY_Model(Model):
                     f += np.outer(t**i, (np.dot(e[i, :], coeffs[c_order])))
                 elif t_op == "multiply":
                     f += np.multiply(t**i, (np.dot(e[i, :], coeffs[c_order])))
-
-        if reshape_output:
-            f = np.reshape(f, output_shape)
 
         return f
 
