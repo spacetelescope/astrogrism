@@ -102,52 +102,38 @@ class AstrogrismForwardGrismDispersion(Model):
         ymodel = self.ymodels[iorder]
         lmodel = self.lmodels[iorder]
 
-        dx_2d = xmodel.evaluate(x0, y0, t, t_op="outer")
-        dy_2d = ymodel.evaluate(x0, y0, t, t_op="outer")
+        dx = xmodel.evaluate(x0, y0, t, t_op="outer")
+        dy = ymodel.evaluate(x0, y0, t, t_op="outer")
 
-        if len(dx.shape) == 1:
-            dx_2d = np.expand_dims(dx_2d, 1)
-            dy_2d = np.expand_dims(dy_2d, 1)
+        if len(dx.shape) == 2:
+            dx = dx[:, 0]
+            dy = dy[:, 0]
 
-        # Loop to account for arrays
-        x_out = []
-        y_out = []
-        l_out = []
-        for i in range(dx_2d.shape[1]):
-            dx = dx_2d[:,i]
-            dy = dy_2d[:,i]
+        if self.theta != 0.0:
+            rotate = Rotation2D(self.theta)
+            dx, dy = rotate(dx, dy)
 
-            if self.theta != 0.0:
-                rotate = Rotation2D(self.theta)
-                dx, dy = rotate(dx, dy)
+        so = np.argsort(dx)
+        tab = Tabular1D(dx[so], t[so], bounds_error=False, fill_value=None)
 
-            so = np.argsort(dx)
-            print(f"dx: {dx.shape} {dx}")
-            print(f"so: {so.shape} {so}")
-            print(f"t: {t.shape} {t}")
-            tab = Tabular1D(dx[so], t[so], bounds_error=False, fill_value=None)
+        dxr = astmath.SubtractUfunc()
 
-            dxr = astmath.SubtractUfunc()
-
-            # Need to build this compound model differently depending on lmodel inputs
-            if lmodel.n_inputs == 1:
-                wavelength = dxr | tab | lmodel
-                model = Mapping((2, 3, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
+        # Need to build this compound model differently depending on lmodel inputs
+        if lmodel.n_inputs == 1:
+            wavelength = dxr | tab | lmodel
+            model = Mapping((2, 3, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
                                                     wavelength & Const1D(order))
-            elif lmodel.n_inputs == 3:
-                wavelength = Identity(2) & dxr | Identity(2) & tab | lmodel
-                model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
+        elif lmodel.n_inputs == 3:
+            wavelength = Identity(2) & dxr | Identity(2) & tab | lmodel
+            model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
                                                           wavelength & Const1D(order))
 
-            x_temp, y_temp, l_temp, order_out = model(x, y, x0, y0, order)
-            print(f"x_temp: {x_temp}")
-            print(f"l_temp: {l_temp}")
-            print()
-            x_out.append(x_temp)
-            y_out.append(y_temp)
-            l_out.append(l_temp)
+        x_out, y_out, l_out, order_out = model(x, y, x0, y0, order)
 
-        return np.array(x_out), np.array(y_out), np.array(l_out)*u.Unit(self.l_unit), order_out
+        # In this case we had a single wavelength with multiple pixel locations
+        if x0.shape == l_out.shape or y0.shape == l_out.shape:
+            l_out = l_out[0]
+        return x_out, y_out, l_out*u.Unit(self.l_unit), order_out
 
 
 class AstrogrismBackwardGrismDispersion(Model):
