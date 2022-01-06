@@ -44,7 +44,7 @@ class DISPXY_Model(Model):
 
         elif x.shape == (1,):
             if y.shape == (1,):
-                # Explicitly include this just to not forget about this case
+                # Explicitly include this case even though nothing needs to be done
                 pass
             if y.shape != (1,):
                 x = np.full(y.shape, x[0])
