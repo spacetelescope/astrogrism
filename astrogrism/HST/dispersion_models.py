@@ -35,6 +35,9 @@ class DISPXY_Model(Model):
         e = self.ematrix
         offset = self.offset
 
+        x = np.array(x)
+        y = np.array(y)
+
         # If x and y are 1D arrays, check that they have the same number of elements
         if x.shape != (1,) and y.shape != (1,):
             if x.shape != y.shape:

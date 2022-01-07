@@ -131,8 +131,10 @@ class AstrogrismForwardGrismDispersion(Model):
         x_out, y_out, l_out, order_out = model(x, y, x0, y0, order)
 
         # In this case we had a single wavelength with multiple pixel locations
-        if x0.shape == l_out.shape or y0.shape == l_out.shape:
-            l_out = l_out[0]
+        if isinstance(l_out, np.ndarray):
+            if x0.shape == l_out.shape or y0.shape == l_out.shape:
+                l_out = l_out[0]
+
         return x_out, y_out, l_out*u.Unit(self.l_unit), order_out
 
 
