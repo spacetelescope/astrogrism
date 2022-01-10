@@ -102,8 +102,12 @@ class AstrogrismForwardGrismDispersion(Model):
         ymodel = self.ymodels[iorder]
         lmodel = self.lmodels[iorder]
 
-        dx = xmodel.evaluate(x0, y0, t)
-        dy = ymodel.evaluate(x0, y0, t)
+        dx = xmodel.evaluate(x0, y0, t, t_op="outer")
+        dy = ymodel.evaluate(x0, y0, t, t_op="outer")
+
+        if len(dx.shape) == 2:
+            dx = dx[:, 0]
+            dy = dy[:, 0]
 
         if self.theta != 0.0:
             rotate = Rotation2D(self.theta)
@@ -124,8 +128,14 @@ class AstrogrismForwardGrismDispersion(Model):
             model = Mapping((2, 3, 0, 1, 0, 2, 4)) | (Const1D(x0) & Const1D(y0) &
                                                       wavelength & Const1D(order))
 
-        x_out, y_out, wavelength, order = model(x, y, x0, y0, order)
-        return x_out, y_out, wavelength*u.Unit(self.l_unit), order
+        x_out, y_out, l_out, order_out = model(x, y, x0, y0, order)
+
+        # In this case we had a single wavelength with multiple pixel locations
+        if isinstance(l_out, np.ndarray):
+            if x0.shape == l_out.shape or y0.shape == l_out.shape:
+                l_out = l_out[0]
+
+        return x_out, y_out, l_out*u.Unit(self.l_unit), order_out
 
 
 class AstrogrismBackwardGrismDispersion(Model):
@@ -222,7 +232,6 @@ class AstrogrismBackwardGrismDispersion(Model):
         else:
             warnings.warn(f"Assuming input wavelength is in {self.l_unit}. To "
                           "specify wavelength unit, input an astropy Quantity.")
-
         try:
             iorder = self._order_mapping[int(order.flatten()[0])]
         except AttributeError:
@@ -236,10 +245,17 @@ class AstrogrismBackwardGrismDispersion(Model):
             if self.lmodels[iorder].n_inputs == 1:
                 l = self.lmodels[iorder].evaluate(t)
             elif self.lmodels[iorder].n_inputs == 3:
-                l = self.lmodels[iorder].evaluate(x, y, t)
-            so = np.argsort(l)
-            tab = Tabular1D(l[so], t[so], bounds_error=False, fill_value=None)
-            t = tab(wavelength)
+                l = self.lmodels[iorder].evaluate(x, y, t, t_op="outer")
+
+            # Loop to account for arrays
+            t_fit = []
+            for i in range(l.shape[1]):
+                so = np.argsort(l[:, i])
+                tab = Tabular1D(l[so, i], t[so], bounds_error=False, fill_value=None)
+                t_fit.append(tab(wavelength))
+            # tab = Tabular1D(l, t, bounds_error=False, fill_value=None)
+            # t = tab(wavelength)
+            t = np.array(t_fit).flatten()
         else:
             if self.lmodels[iorder].n_inputs == 1:
                 t = self.lmodels[iorder](wavelength)

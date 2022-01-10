@@ -30,23 +30,38 @@ class DISPXY_Model(Model):
         self._model_set_axis = False
 
     # Note that in the inverse case, input "t" here is actually dx or dy
-    def evaluate(self, x, y, t):
+    def evaluate(self, x, y, t, t_op="multiply"):
 
         e = self.ematrix
         offset = self.offset
-        if isinstance(x, np.ndarray):
-            if len(x) == 1:
-                x = float(x)
-            else:
-                raise ValueError(f"x is array: {x}")
-        if isinstance(y, np.ndarray):
-            if len(y) == 1:
-                y = float(y)
-            else:
-                raise ValueError(f"y is array: {y}")
+
+        x = np.array(x)
+        y = np.array(y)
+
+        # If x and y are 1D arrays, check that they have the same number of elements
+        if x.shape != (1,) and y.shape != (1,):
+            if x.shape != y.shape:
+                raise ValueError("If x and y are 1D arrays they must have the"
+                                 "same shape. See documentation for instructions"
+                                 "for dispersing a 2D region.")
+
+        elif x.shape == (1,):
+            if y.shape == (1,):
+                # Explicitly include this case even though nothing needs to be done
+                pass
+            if y.shape != (1,):
+                x = np.full(y.shape, x[0])
+
+        elif y.shape == (1,) and x.shape != (1,):
+            y = np.full(x.shape, y[0])
+
+        else:
+            raise ValueError("Array input for x and y can only be 1 dimensional")
+
+        const = np.full(x.shape, 1)
 
         coeffs = {1: np.array([1]),
-                  6: np.array([1, x, y, x**2, x*y, y**2])}
+                  6: np.array([const, x, y, x**2, x*y, y**2])}
 
         t_order = e.shape[0]
         if len(e.shape) == 1:
@@ -55,13 +70,17 @@ class DISPXY_Model(Model):
             c_order = e.shape[1]
 
         f = 0
+        t = np.array(t)
 
         if self.inv:
-            f = ((t + offset - np.dot(coeffs[c_order], e[0, :])) /
-                 np.dot(coeffs[c_order], e[1, :]))
+            f = ((t + offset - np.dot(e[0, :], coeffs[c_order])) /
+                 np.dot(e[1, :], coeffs[c_order]))
         else:
             for i in range(0, t_order):
-                f += t**i * (np.dot(coeffs[c_order], e[i, :]))
+                if t_op == "outer":
+                    f += np.outer(t**i, (np.dot(e[i, :], coeffs[c_order])))
+                elif t_op == "multiply":
+                    f += np.multiply(t**i, (np.dot(e[i, :], coeffs[c_order])))
 
         return f
 
