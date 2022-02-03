@@ -31,6 +31,12 @@ class GrismObs():
         else:
             raise TypeError("grism_image must be either a string filepath or FITS HDUList")
 
+        # Determine if the grism image used subarray mode
+        try:
+            self.is_subarray = self.grism_image[0].header['SUBARRAY']
+        except KeyError:
+            self.is_subarray = False
+
         # Read direct image file if string input
         if direct_image is None:
             self.direct_image = None
@@ -44,7 +50,7 @@ class GrismObs():
         # Parse grism image file header for meta info
         self.grism_header = self.grism_image["PRIMARY"].header
 
-        # Attempt to retrieve any information missing from the header (e.g. SIP)
+        # Attempt to retrieve any unspecified keywords from the header (e.g. SIP)
         # Should probably make these properties instead.
         if telescope is None:
             self.telescope = self.grism_header["TELESCOP"]
@@ -72,6 +78,23 @@ class GrismObs():
             self.geometric_transforms["CCD2"] = self._build_geometric_transforms(channel=2)
         else:
             self.geometric_transforms = self._build_geometric_transforms()
+
+    def _calculate_subarray_offsets(self):
+        centera1 = self.grism_header["CENTERA1"]
+        centera2 = self.grism_header["CENTERA2"]
+        sizaxis1 = self.grism_header["SIZAXIS1"]
+        sizaxis2 = self.grism_header["SIZAXIS2"]
+
+        if self.instrument == "WFC3_UVIS":
+            x_offset = centera1 - (sizaxis1 / 2) - 1
+            y_offset = centera2 - (sizaxis2 / 2) - 26
+        elif self.instrument == "WFC3_IR":
+            x_offset = centera1 - (sizaxis1 / 2) - 1
+            y_offset = centera2 - (sizaxis2 / 2) - 1
+        else:
+            raise ValueError(f"Subarrays not currently supported for {self.instrument}")
+
+        return x_offset, y_offset
 
     def _build_geometric_transforms(self, channel=None):
 
@@ -114,6 +137,13 @@ class GrismObs():
         spec_wcs_file = config_dir / "{}_{}_specwcs.asdf".format(
                                                        self.instrument,
                                                        filter)
+
+        # Calculate coordinate offsets if in subarray mode
+        if self.is_subarray:
+            x_offset, y_offset = self._calculate_subarray_offsets()
+        else:
+            x_offset = 0
+            y_offset = 0
 
         # Build the grism_detector <-> detector transforms
         with asdf.open(str(spec_wcs_file)) as f:
