@@ -44,7 +44,8 @@ class AstrogrismForwardGrismDispersion(Model):
     n_outputs = 4
 
     def __init__(self, orders, lmodels=None, xmodels=None, ymodels=None,
-                 theta=0., name=None, meta=None, l_unit="micron"):
+                 theta=0., name=None, meta=None, l_unit="micron",
+                 x_offset = 0, y_offset = 0):
         self._order_mapping = {int(k): v for v, k in enumerate(orders)}
         self.xmodels = xmodels
         self.ymodels = ymodels
@@ -52,6 +53,8 @@ class AstrogrismForwardGrismDispersion(Model):
         self.theta = theta
         self.orders = orders
         self.l_unit = l_unit
+        self.x_offset = x_offset
+        self.y_offset = y_offset
         meta = {"orders": orders}
         if name is None:
             name = 'astrogrism_forward_grism_dispersion'
@@ -102,8 +105,10 @@ class AstrogrismForwardGrismDispersion(Model):
         ymodel = self.ymodels[iorder]
         lmodel = self.lmodels[iorder]
 
-        dx = xmodel.evaluate(x0, y0, t, t_op="outer")
-        dy = ymodel.evaluate(x0, y0, t, t_op="outer")
+        # For subarrays, we need to get use the location on the full array
+        # to calculate offsets
+        dx = xmodel.evaluate(x0 + self.x_offset, y0+self.y_offset, t, t_op="outer")
+        dy = ymodel.evaluate(x0 + self.x_offset, y0+self.y_offset, t, t_op="outer")
 
         if len(dx.shape) == 2:
             dx = dx[:, 0]
@@ -172,9 +177,9 @@ class AstrogrismBackwardGrismDispersion(Model):
     n_inputs = 4
     n_outputs = 5
 
-    def __init__(self, orders, lmodels=None, xmodels=None,
-                 ymodels=None, theta=None, name=None, meta=None,
-                 interpolate_t=False, l_unit="micron"):
+    def __init__(self, orders, lmodels=None, xmodels=None, ymodels=None,
+                 theta=None, name=None, meta=None, interpolate_t=False,
+                 l_unit="micron", x_offset=0, y_offset=0):
         self._order_mapping = {int(k): v for v, k in enumerate(orders)}
         self.xmodels = xmodels
         # TODO: Raise a warning if no inverse transform is possible (for example
@@ -185,6 +190,8 @@ class AstrogrismBackwardGrismDispersion(Model):
         self.theta = theta
         self.interpolate_t = interpolate_t
         self.l_unit = l_unit
+        self.x_offset = x_offset
+        self.y_offset = y_offset
         meta = {"orders": orders}
         if name is None:
             name = 'astrogrism_backward_grism_dispersion'
@@ -245,7 +252,9 @@ class AstrogrismBackwardGrismDispersion(Model):
             if self.lmodels[iorder].n_inputs == 1:
                 l = self.lmodels[iorder].evaluate(t)
             elif self.lmodels[iorder].n_inputs == 3:
-                l = self.lmodels[iorder].evaluate(x, y, t, t_op="outer")
+                l = self.lmodels[iorder].evaluate(x+self.x_offset,
+                                                  y+self.y_offset,
+                                                  t, t_op="outer")
 
             # Loop to account for arrays
             t_fit = []
@@ -260,15 +269,15 @@ class AstrogrismBackwardGrismDispersion(Model):
             if self.lmodels[iorder].n_inputs == 1:
                 t = self.lmodels[iorder](wavelength)
             elif self.lmodels[iorder].n_inputs == 3:
-                t = self.lmodels[iorder](x, y, wavelength)
+                t = self.lmodels[iorder](x+x_offset, y+y_offset, wavelength)
 
         xmodel = self.xmodels[iorder]
         ymodel = self.ymodels[iorder]
 
-        dx = xmodel.evaluate(x, y, t)
-        dy = ymodel.evaluate(x, y, t)
+        dx = xmodel.evaluate(x+self.x_offset, y+self.y_offset, t)
+        dy = ymodel.evaluate(x+self.x_offset, y+self.y_offset, t)
 
-        # rotate by theta
+        # Rotate by theta. Do we need to account for subarray offsets here?
         if self.theta != 0.0:
             rotate = Rotation2D(self.theta)
             dx, dy = rotate(dx, dy)

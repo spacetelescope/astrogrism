@@ -79,21 +79,25 @@ class GrismObs():
         else:
             self.geometric_transforms = self._build_geometric_transforms()
 
-    def _calculate_subarray_offsets(self):
-        centera1 = self.grism_header["CENTERA1"]
-        centera2 = self.grism_header["CENTERA2"]
-        sizaxis1 = self.grism_header["SIZAXIS1"]
-        sizaxis2 = self.grism_header["SIZAXIS2"]
+    def _calculate_subarray_offsets(self, instrument):
 
-        if self.instrument == "WFC3_UVIS":
+        image_header = self.grism_image["SCI"].header
+        centera1 = image_header["CENTERA1"]
+        centera2 = image_header["CENTERA2"]
+        sizaxis1 = image_header["SIZAXIS1"]
+        sizaxis2 = image_header["SIZAXIS2"]
+
+        if instrument == "WFC3_UVIS":
             x_offset = centera1 - (sizaxis1 / 2) - 1
+            # This accounts for serial_over from wf3tools.sub2full
             y_offset = centera2 - (sizaxis2 / 2) - 26
-        elif self.instrument == "WFC3_IR":
+        elif instrument == "WFC3_IR":
             x_offset = centera1 - (sizaxis1 / 2) - 1
             y_offset = centera2 - (sizaxis2 / 2) - 1
         else:
-            raise ValueError(f"Subarrays not currently supported for {self.instrument}")
+            raise ValueError(f"Subarrays not currently supported for {instrument}")
 
+        print(x_offset, y_offset)
         return x_offset, y_offset
 
     def _build_geometric_transforms(self, channel=None):
@@ -140,7 +144,7 @@ class GrismObs():
 
         # Calculate coordinate offsets if in subarray mode
         if self.is_subarray:
-            x_offset, y_offset = self._calculate_subarray_offsets()
+            x_offset, y_offset = self._calculate_subarray_offsets(instrument)
         else:
             x_offset = 0
             y_offset = 0
@@ -205,9 +209,16 @@ class GrismObs():
 
         sip_hdu = sip_hdus[sip_hdu_index]
 
-        acoef = dict(sip_hdu.header['A_*'])
+        try:
+            acoef = dict(self.grism_image[1].header['A_*'])
+        except:
+            acoef = dict(sip_hdu.header['A_*'])
+        print(acoef)
         a_order = acoef.pop('A_ORDER')
-        bcoef = dict(sip_hdu.header['B_*'])
+        try:
+            bcoef = dict(self.grism_image[1].header['B_*'])
+        except:
+            bcoef = dict(sip_hdu.header['B_*'])
         b_order = bcoef.pop('B_ORDER')
 
         # Get the inverse SIP polynomial coefficients from file
