@@ -67,6 +67,13 @@ class GrismObs():
                 self.filter = self.grism_header["FILTER"]
             elif "FILTER1" in self.grism_header:
                 self.filter = self.grism_header["FILTER1"]
+            # Check to make sure we didn't get an Fxxx instead of Gxxx
+            if self.filter[0] == "F":
+                # try aperture
+                if "APERTURE" in self.grism_header:
+                    if self.grism_header["APERTURE"][0] == "G":
+                        self.filter = self.grism_header["APERTURE"]
+                        self.filter = self.filter.replace("-REF", "")
         else:
             self.filter = filter
 
@@ -209,16 +216,9 @@ class GrismObs():
 
         sip_hdu = sip_hdus[sip_hdu_index]
 
-        try:
-            acoef = dict(self.grism_image[1].header['A_*'])
-        except:
-            acoef = dict(sip_hdu.header['A_*'])
-        print(acoef)
+        acoef = dict(sip_hdu.header['A_*'])
         a_order = acoef.pop('A_ORDER')
-        try:
-            bcoef = dict(self.grism_image[1].header['B_*'])
-        except:
-            bcoef = dict(sip_hdu.header['B_*'])
+        bcoef = dict(sip_hdu.header['B_*'])
         b_order = bcoef.pop('B_ORDER')
 
         # Get the inverse SIP polynomial coefficients from file
