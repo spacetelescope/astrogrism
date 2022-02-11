@@ -176,7 +176,9 @@ class GrismObs():
                                                    lmodels=displ,
                                                    xmodels=invdispx,
                                                    ymodels=dispy,
-                                                   l_unit=l_unit)
+                                                   l_unit=l_unit,
+                                                   x_offset=x_offset,
+                                                   y_offset=y_offset)
         # TODO: Decide where to raise a warning if we can't do the backward
         # grism transformation (UVIS, at least for now).
         if invdispl is not None:
@@ -184,14 +186,18 @@ class GrismObs():
                                                                 lmodels=invdispl,
                                                                 xmodels=dispx,
                                                                 ymodels=dispy,
-                                                                l_unit=l_unit)
+                                                                l_unit=l_unit,
+                                                                x_offset=x_offset,
+                                                                y_offset=y_offset)
         else:
             det2det.inverse = AstrogrismBackwardGrismDispersion(orders,
                                                                 lmodels=displ,
                                                                 xmodels=dispx,
                                                                 ymodels=dispy,
                                                                 interpolate_t=True,
-                                                                l_unit=l_unit)
+                                                                l_unit=l_unit,
+                                                                x_offset=x_offset,
+                                                                y_offset=y_offset)
 
         grism_pipeline = [(gdetector, det2det)]
 
