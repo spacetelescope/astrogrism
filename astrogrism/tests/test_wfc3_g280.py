@@ -57,3 +57,23 @@ def test_wfc3_g280_roundtrip():
      range(len(world_ref1))]
     [assert_quantity_allclose(g2w2_res[i], world_ref2[i], rtol=0.005) for i in
      range(len(world_ref2))]
+
+    w2d_expected = (2047, 1025, 4000*u.AA, 1.0)
+
+    d2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("detector", "world")
+    w2d1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "detector")
+
+    d2w2 = grism_obs.geometric_transforms["CCD2"].get_transform("detector", "world")
+    w2d2 = grism_obs.geometric_transforms["CCD2"].get_transform("world", "detector")
+
+    [assert_quantity_allclose(w2d1(*world_ref1)[i], w2d_expected[i], rtol=5e-5) for
+            i in range(len(world_ref1))]
+    [assert_quantity_allclose(w2d2(*world_ref2)[i], w2d_expected[i], rtol=5e-5) for
+            i in range(len(world_ref2))]
+
+    d2w1_res = d2w1(*w2d_expected)
+    d2w2_res = d2w2(*w2d_expected)
+    [assert_quantity_allclose(d2w1_res[i], world_ref1[i], rtol=0.005) for i in
+     range(len(world_ref1))]
+    [assert_quantity_allclose(d2w2_res[i], world_ref2[i], rtol=0.005) for i in
+     range(len(world_ref2))]
