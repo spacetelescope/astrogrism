@@ -19,7 +19,7 @@ def test_acs_g800l_roundtrip():
 
     assert grism_obs.geometric_transforms["CCD1"].available_frames == ['grism_detector',
                                                                        'detector', 'world']
-    assert grism_obs.geometric_transforms["CCD1"].available_frames == ['grism_detector',
+    assert grism_obs.geometric_transforms["CCD2"].available_frames == ['grism_detector',
                                                                        'detector', 'world']
 
     # Check that detector -> grism is working before checking full transform
@@ -55,4 +55,26 @@ def test_acs_g800l_roundtrip():
     [assert_quantity_allclose(g2w1_res[i], world_ref1[i], rtol=0.005) for i in
      range(len(world_ref1))]
     [assert_quantity_allclose(g2w2_res[i], world_ref2[i], rtol=0.005) for i in
+     range(len(world_ref2))]
+
+    # Test world <-> detector transforms
+    w2d1_expected = (2047, 1023, 0.7*u.Unit("micron"), 1.0)
+    w2d2_expected = (2047, 1023, 0.7*u.Unit("micron"), 1.0)
+
+    d2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("detector", "world")
+    w2d1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "detector")
+
+    d2w2 = grism_obs.geometric_transforms["CCD2"].get_transform("detector", "world")
+    w2d2 = grism_obs.geometric_transforms["CCD2"].get_transform("world", "detector")
+
+    [assert_quantity_allclose(w2d1(*world_ref1)[i], w2d1_expected[i], rtol=5e-5) for
+     i in range(len(world_ref1))]
+    [assert_quantity_allclose(w2d2(*world_ref2)[i], w2d2_expected[i], rtol=5e-5) for
+     i in range(len(world_ref2))]
+
+    d2w1_res = d2w1(*w2d1_expected)
+    d2w2_res = d2w2(*w2d2_expected)
+    [assert_quantity_allclose(d2w1_res[i], world_ref1[i], rtol=0.005) for i in
+     range(len(world_ref1))]
+    [assert_quantity_allclose(d2w2_res[i], world_ref2[i], rtol=0.005) for i in
      range(len(world_ref2))]
