@@ -159,11 +159,21 @@ class GrismObs():
 
         # Get the correct hdu from the SIP file
         if channel is not None:
-            for hdu in sip_hdus:
+            for i in range(len(sip_hdus)):
+                hdu = sip_hdus[i]
                 if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
-                    sip_hdu = hdu
+                    sip_hdu_index = i
+                    break
+            for i in range(len(self.grism_image)):
+                hdu = self.grism_image[i]
+                if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
+                    hdu_index = i
+                    break
         else:
-            sip_hdu = sip_hdus[1]
+            hdu_index = 1
+            sip_hdu_index = 1
+
+        sip_hdu = sip_hdus[sip_hdu_index]
 
         acoef = dict(sip_hdu.header['A_*'])
         a_order = acoef.pop('A_ORDER')
@@ -182,15 +192,16 @@ class GrismObs():
         except ValueError:
             raise
 
-        crpix = [self.grism_image[1].header['CRPIX1'], self.grism_image[1].header['CRPIX2']]
+        crpix = [self.grism_image[hdu_index].header['CRPIX1'],
+                 self.grism_image[hdu_index].header['CRPIX2']]
 
-        crval = [self.grism_image[1].header['CRVAL1'],
-                 self.grism_image[1].header['CRVAL2']]
+        crval = [self.grism_image[hdu_index].header['CRVAL1'],
+                 self.grism_image[hdu_index].header['CRVAL2']]
 
-        cdmat = np.array([[self.grism_image[1].header['CD1_1'],
-                           self.grism_image[1].header['CD1_2']],
-                          [self.grism_image[1].header['CD2_1'],
-                           self.grism_image[1].header['CD2_2']]])
+        cdmat = np.array([[self.grism_image[hdu_index].header['CD1_1'],
+                           self.grism_image[hdu_index].header['CD1_2']],
+                          [self.grism_image[hdu_index].header['CD2_1'],
+                           self.grism_image[hdu_index].header['CD2_2']]])
 
         a_polycoef = {}
         for key in acoef:
