@@ -206,6 +206,7 @@ class GrismObs():
 
         # Get the correct hdu from the SIP file
         if channel is not None:
+            hdu_index = None
             for i in range(len(sip_hdus)):
                 hdu = sip_hdus[i]
                 if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
@@ -216,6 +217,9 @@ class GrismObs():
                 if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
                     hdu_index = i
                     break
+            if hdu_index is None:
+                # No HDU for this chip in this observation
+                return None
         else:
             hdu_index = 1
             sip_hdu_index = 1
