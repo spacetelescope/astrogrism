@@ -17,19 +17,22 @@ SIM_DATA_DIR = Path(gettempdir()) / "astrogrism" / "simulation_files"
 
 
 def _generate_simulation_spectrum(grism):
+    # Prepare environment required for stsynphot to be imported
     environ['PYSYN_CDBS'] = str(SIM_DATA_DIR / 'grp' / 'redcat' / 'trds')
     if not SIM_DATA_DIR.is_dir():
+        # Download HST Instrument Data Files
         SIM_DATA_DIR.mkdir(parents=True, exist_ok=True)
         hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz'))
         with tar_open(hst_data_files_archive) as tar:
             tar.extractall(path=SIM_DATA_DIR)
 
+        # Download Vega CALSPEC Reference Atlas
         calspec_dir = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec'
         calspec_dir.mkdir(parents=True, exist_ok=True)
         vega_reference_atlas = Path(download_file('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/alpha_lyr_stis_010.fits'))
         vega_reference_atlas.replace(calspec_dir / 'alpha_lyr_stis_010.fits')
 
-    from stsynphot import Vega
+    from stsynphot import Vega # noqa
     return Vega.to_spectrum1d()
 
 
