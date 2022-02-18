@@ -1,27 +1,36 @@
 from math import floor
+from os import environ
 from pathlib import Path
+from tarfile import open as tar_open
+from tempfile import gettempdir
 
 from astrogrism import GrismObs
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy import units as u
+from astropy.utils.data import download_file
 import numpy as np
 
 from specutils import Spectrum1D
-import stsynphot as stsyn
 
-
-def _fake_spectrum():
-    spec_axis = np.linspace(6000, 8000, 10) * u.AA
-    flux = (np.random.randn(len(spec_axis.value)) +
-            10*np.exp(-0.001*(spec_axis.value-6563)**2) +
-            spec_axis.value/500) * u.Jy
-
-    return Spectrum1D(spectral_axis=spec_axis, flux=flux)
+SIM_DATA_DIR = Path(gettempdir()) / "astrogrism" / "simulation_files"
 
 
 def _generate_simulation_spectrum(grism):
-    return _fake_spectrum()
+    environ['PYSYN_CDBS'] = str(SIM_DATA_DIR / 'grp' / 'redcat' / 'trds')
+    if not SIM_DATA_DIR.is_dir():
+        SIM_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz'))
+        with tar_open(hst_data_files_archive) as tar:
+            tar.extractall(path=SIM_DATA_DIR)
+
+        calspec_dir = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec'
+        calspec_dir.mkdir(parents=True, exist_ok=True)
+        vega_reference_atlas = Path(download_file('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/alpha_lyr_stis_010.fits'))
+        vega_reference_atlas.replace(calspec_dir / 'alpha_lyr_stis_010.fits')
+
+    from stsynphot import Vega
+    return Vega.to_spectrum1d()
 
 
 def _create_simulation_cube(spectrum, shape, wcs):
