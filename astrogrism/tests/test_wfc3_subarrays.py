@@ -69,8 +69,7 @@ def test_ir_subarray():
     grism_hdr = grism_obs.grism_image[1].header
 
     assert grism_obs.geometric_transforms.available_frames == ['grism_detector',
-                                                                       'detector', 'world']
-
+                                                               'detector', 'world']
 
     # Check that detector -> grism is working before checking full transform
     d2g = grism_obs.geometric_transforms.get_transform("detector", "grism_detector")
@@ -85,7 +84,8 @@ def test_ir_subarray():
     g2w = grism_obs.geometric_transforms.get_transform("grism_detector", "world")
     w2g = grism_obs.geometric_transforms.get_transform("world", "grism_detector")
 
-    w2g_expected = (94.1271186539101, 137.60409410896412, grism_hdr["CRPIX1"]-1, grism_hdr["CRPIX2"]-1, 1.0)
+    w2g_expected = (94.1271186539101, 137.60409410896412, grism_hdr["CRPIX1"]-1,
+                    grism_hdr["CRPIX2"]-1, 1.0)
 
     np.testing.assert_allclose(w2g(*world_ref), w2g_expected, rtol=5e-6)
 

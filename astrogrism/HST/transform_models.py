@@ -45,7 +45,7 @@ class AstrogrismForwardGrismDispersion(Model):
 
     def __init__(self, orders, lmodels=None, xmodels=None, ymodels=None,
                  theta=0., name=None, meta=None, l_unit="micron",
-                 x_offset = 0, y_offset = 0):
+                 x_offset=0, y_offset=0):
         self._order_mapping = {int(k): v for v, k in enumerate(orders)}
         self.xmodels = xmodels
         self.ymodels = ymodels
@@ -269,7 +269,7 @@ class AstrogrismBackwardGrismDispersion(Model):
             if self.lmodels[iorder].n_inputs == 1:
                 t = self.lmodels[iorder](wavelength)
             elif self.lmodels[iorder].n_inputs == 3:
-                t = self.lmodels[iorder](x+x_offset, y+y_offset, wavelength)
+                t = self.lmodels[iorder](x+self.x_offset, y+self.y_offset, wavelength)
 
         xmodel = self.xmodels[iorder]
         ymodel = self.ymodels[iorder]
