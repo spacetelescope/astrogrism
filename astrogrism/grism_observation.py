@@ -98,7 +98,7 @@ class GrismObs():
             x_offset = centera1 - (sizaxis1 / 2) - 1
             # This accounts for serial_over from wf3tools.sub2full
             y_offset = centera2 - (sizaxis2 / 2) - 26
-        elif instrument == "WFC3_IR":
+        elif instrument in ("WFC3_IR", "ACS_WFC"):
             x_offset = centera1 - (sizaxis1 / 2) - 1
             y_offset = centera2 - (sizaxis2 / 2) - 1
         else:
