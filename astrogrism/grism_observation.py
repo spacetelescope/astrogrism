@@ -67,13 +67,18 @@ class GrismObs():
                 self.filter = self.grism_header["FILTER"]
             elif "FILTER1" in self.grism_header:
                 self.filter = self.grism_header["FILTER1"]
-            # Check to make sure we didn't get an Fxxx instead of Gxxx
-            if self.filter[0] == "F":
+            # Check to make sure we didn't something other than Gxxx from FILTER
+            if self.filter[0] != "G":
                 # try aperture
                 if "APERTURE" in self.grism_header:
                     if self.grism_header["APERTURE"][0] == "G":
                         self.filter = self.grism_header["APERTURE"]
+                        # Sometimes the grism is listed as G...-REF for some reason
+                        # As far as I'm aware it's not an important distiction for us
                         self.filter = self.filter.replace("-REF", "")
+                    else:
+                        raise ValueError("Could not determine grism from FILTER or APERTURE"
+                                         " header keywords")
         else:
             self.filter = filter
 
@@ -104,7 +109,6 @@ class GrismObs():
         else:
             raise ValueError(f"Subarrays not currently supported for {instrument}")
 
-        print(x_offset, y_offset)
         return x_offset, y_offset
 
     def _build_geometric_transforms(self, channel=None):
@@ -207,13 +211,11 @@ class GrismObs():
         # Get the correct hdu from the SIP file
         if channel is not None:
             hdu_index = None
-            for i in range(len(sip_hdus)):
-                hdu = sip_hdus[i]
+            for i, hdu in enumerate(sip_hdus):
                 if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
                     sip_hdu_index = i
                     break
-            for i in range(len(self.grism_image)):
-                hdu = self.grism_image[i]
+            for i, hdu in enumerate(self.grism_image):
                 if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
                     hdu_index = i
                     break
