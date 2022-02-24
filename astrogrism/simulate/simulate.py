@@ -49,7 +49,7 @@ def _generate_simulation_spectrum(grism, detector=None):
         bandpass = band(f'wfc3,uvis{detector},g280')
     elif grism == 'G800L':
         bandpass = band(f'acs,wfc{detector},g800l')
-        else:
+    else:
         raise ValueError(f"Unrecognized grism: {grism}. Valid grisms: G141, G102, G280, G800L")
             
     return (bandpass * Vega).to_spectrum1d()
