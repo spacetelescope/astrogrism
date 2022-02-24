@@ -18,6 +18,9 @@ SIM_DATA_DIR = Path(gettempdir()) / "astrogrism" / "simulation_files"
 
 
 def _generate_simulation_spectrum(grism, detector=None):
+    if detector not in (1,2,None):
+        raise ValueError("Invalid detector argument. Please choose 1 or 2")
+
     # Prepare environment required for stsynphot to be imported
     environ['PYSYN_CDBS'] = str(SIM_DATA_DIR / 'grp' / 'redcat' / 'trds')
     if not SIM_DATA_DIR.is_dir():
@@ -43,19 +46,12 @@ def _generate_simulation_spectrum(grism, detector=None):
             warn("WFC3's G102 grism does not have multiple detectors. Ignoring detector argument", RuntimeWarning)
         bandpass = band('wfc3,ir,g102')
     elif grism == 'G280':
-        if detector == 1:
-            bandpass1 = band('wfc3,uvis1,g280')
-        elif detector == 2:
-            bandpass2 = band('wfc3,uvis2,g280')
-        else:
-            raise ValueError("Invalid Detector Argument. Please choose 1 or 2")
+        bandpass = band(f'wfc3,uvis{detector},g280')
     elif grism == 'G800L':
-        if detector == 1:
-            bandpass1 = band('acs,wfc1,g800l')
-        elif detector == 2:
-            bandpass2 = band('acs,wfc2,g800l')
+        bandpass = band(f'acs,wfc{detector},g800l')
         else:
-            raise ValueError("Invalid Detector Argument. Please choose 1 or 2")
+        raise ValueError(f"Unrecognized grism: {grism}. Valid grisms: G141, G102, G280, G800L")
+            
     return (bandpass * Vega).to_spectrum1d()
 
 
