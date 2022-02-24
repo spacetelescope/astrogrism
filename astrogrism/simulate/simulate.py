@@ -3,6 +3,7 @@ from os import environ
 from pathlib import Path
 from tarfile import open as tar_open
 from tempfile import gettempdir
+from warnings import warn
 
 from astrogrism import GrismObs
 from astropy.io import fits
@@ -16,7 +17,7 @@ from specutils import Spectrum1D
 SIM_DATA_DIR = Path(gettempdir()) / "astrogrism" / "simulation_files"
 
 
-def _generate_simulation_spectrum(grism):
+def _generate_simulation_spectrum(grism, detector=None):
     # Prepare environment required for stsynphot to be imported
     environ['PYSYN_CDBS'] = str(SIM_DATA_DIR / 'grp' / 'redcat' / 'trds')
     if not SIM_DATA_DIR.is_dir():
@@ -32,8 +33,30 @@ def _generate_simulation_spectrum(grism):
         vega_reference_atlas = Path(download_file('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/alpha_lyr_stis_010.fits'))
         vega_reference_atlas.replace(calspec_dir / 'alpha_lyr_stis_010.fits')
 
-    from stsynphot import Vega # noqa
-    return Vega.to_spectrum1d()
+    from stsynphot import Vega, band # noqa
+    if grism == 'G141':
+        if detector:
+            warn("WFC3's G141 grism does not have multiple detectors. Ignoring detector argument", RuntimeWarning)
+        bandpass = band('wfc3,ir,g141')
+    elif grism == 'G102':
+        if detector:
+            warn("WFC3's G102 grism does not have multiple detectors. Ignoring detector argument", RuntimeWarning)
+        bandpass = band('wfc3,ir,g102')
+    elif grism == 'G280':
+        if detector == 1:
+            bandpass1 = band('wfc3,uvis1,g280')
+        elif detector == 2:
+            bandpass2 = band('wfc3,uvis2,g280')
+        else:
+            raise ValueError("Invalid Detector Argument. Please choose 1 or 2")
+    elif grism == 'G800L':
+        if detector == 1:
+            bandpass1 = band('acs,wfc1,g800l')
+        elif detector == 2:
+            bandpass2 = band('acs,wfc2,g800l')
+        else:
+            raise ValueError("Invalid Detector Argument. Please choose 1 or 2")
+    return (bandpass * Vega).to_spectrum1d()
 
 
 def _create_simulation_cube(spectrum, shape, wcs):
