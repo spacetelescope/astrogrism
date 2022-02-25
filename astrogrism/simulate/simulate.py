@@ -52,10 +52,22 @@ def _generate_simulation_spectrum(grism, detector=None):
     else:
         raise ValueError(f"Unrecognized grism: {grism}. Valid grisms: G141, G102, G280, G800L")
             
-    return (bandpass * Vega).to_spectrum1d()
+    spectrum = (bandpass * Vega).to_spectrum1d()
 
+    # Find the first value with a non-zero "flux"
+    for i in range(len(spectrum.flux.value)):
+        value = spectrum.flux.value[i]
+        if value != 0.0:
+            min_slice = i
+            break
 
-def _create_simulation_cube(spectrum, shape, wcs):
+    # Find the last value with a non-zero "flux"
+    for i in reversed(range(len(spectrum.flux.value))):
+        value = spectrum.flux.value[i]
+        if value != 0.0:
+            max_slice = i
+            break
+    return spectrum[min_slice:max_slice]
     data = np.tile(spectrum.flux.value * spectrum.flux.unit, (shape[0], shape[1], 1))
     print(data.shape)
     return Spectrum1D(flux=data, spectral_axis=spectrum.spectral_axis, wcs=wcs)
