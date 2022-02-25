@@ -8,7 +8,7 @@ import pytest
 # Taken from wavelengthrange file
 # We should eventual modify the test to actually read the wavelengthrange reference file
 TEST_GRISMS = [
-    ('G141', 1.0402*u.um, 1.7845*u.um)
+    ('G141', 1.0402*u.um, 1.7845*u.um),
     ('G102', 0.7401*u.um, 0.9878*u.um)
 ]
 
