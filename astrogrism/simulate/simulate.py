@@ -9,7 +9,7 @@ from astropy.utils.data import download_file
 SIM_DATA_DIR = Path(mkdtemp()) / "astrogrism_simulation_files"
 
 
-def _generate_simulation_spectrum(grism, detector=None):
+def generate_simulation_spectrum(grism, detector=None):
     if detector not in (1, 2, None):
         raise ValueError("Invalid detector argument. Please choose 1 or 2")
 
