@@ -19,12 +19,14 @@ def test_synthetic_spectrum_grism_bounds(grism, grism_min, grism_max):
     assert_quantity_allclose(spectrum.wavelength.min(), grism_min)
     assert_quantity_allclose(spectrum.wavelength.max(), grism_max)
 
+
 def test_single_chip_detector_warning():
     with pytest.warns(RuntimeWarning):
         generate_simulation_spectrum('G141')
 
     with pytest.warns(RuntimeWarning):
         generate_simulation_spectrum('G102')
+
 
 def test_invalid_detector():
     generate_simulation_spectrum("G141", 3)
