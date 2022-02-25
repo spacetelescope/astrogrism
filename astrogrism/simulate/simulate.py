@@ -1,3 +1,4 @@
+from math import floor
 from os import environ
 from pathlib import Path
 from shutil import copy
@@ -7,6 +8,10 @@ from warnings import warn
 
 from astropy.utils.data import download_file
 from synphot import Observation
+from astropy.wcs import WCS
+import numpy as np
+
+from astrogrism import GrismObs
 
 
 def download_stsynphot_files(download_path):
@@ -132,5 +137,5 @@ def _disperse_spectrum_on_image(grism, wide_field_image, spectrum):
 
 
 def simulate_grism(grism, wide_field_image):
-    spectrum = _generate_simulation_spectrum(grism)
+    spectrum = generate_simulation_spectrum(grism)
     _disperse_spectrum_on_image(grism, wide_field_image, spectrum)
