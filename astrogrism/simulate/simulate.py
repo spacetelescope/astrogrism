@@ -10,6 +10,20 @@ SIM_DATA_DIR = Path(mkdtemp()) / "astrogrism_simulation_files"
 
 
 def generate_simulation_spectrum(grism, detector=None):
+    """
+    Initializes and uses STSynphot to generate a Vega spectrum within the bandpass of a given grism
+
+    Parameters
+    ----------
+    grism : str
+        String representation of one of the four supported HST Grisms
+        Valid grisms: G141, G102, G280, G800L
+
+    detector : int
+        For detectors with multiple chips, specifies which chip to simulate
+        Only useful for G280 and G800L Grisms
+
+    """
     if detector not in (1, 2, None):
         raise ValueError("Invalid detector argument. Please choose 1 or 2")
 
