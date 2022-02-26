@@ -6,10 +6,8 @@ from warnings import warn
 
 from astropy.utils.data import download_file
 
-SIM_DATA_DIR = Path(mkdtemp()) / "astrogrism_simulation_files"
 
-
-def generate_simulation_spectrum(grism, detector=None):
+def generate_simulation_spectrum(grism, detector=None, temp_path=mkdtemp()):
     """
     Initializes and uses STSynphot to generate a Vega spectrum within the bandpass of a given grism
 
@@ -23,7 +21,13 @@ def generate_simulation_spectrum(grism, detector=None):
         For detectors with multiple chips, specifies which chip to simulate
         Only useful for G280 and G800L Grisms
 
+    temp_path : str
+        Path to download necessary files for STSynphot. Fallsback to Python's
+        default temporary folder location
+
     """
+    SIM_DATA_DIR = Path(temp_path) / "astrogrism_simulation_files"
+
     if detector not in (1, 2, None):
         raise ValueError("Invalid detector argument. Please choose 1 or 2")
 
