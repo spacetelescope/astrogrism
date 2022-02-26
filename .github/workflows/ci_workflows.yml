@@ -52,11 +52,6 @@ jobs:
             python: 3.8
             toxenv: py38-test
 
-          - name: Windows - Python 3.8
-            os: windows-latest
-            python: 3.8
-            toxenv: py38-test
-
           - name: Python 3.9 with latest dev versions of key dependencies
             os: ubuntu-latest
             python: 3.9
