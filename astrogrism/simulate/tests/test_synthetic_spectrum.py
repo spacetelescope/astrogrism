@@ -16,8 +16,8 @@ TEST_GRISMS = [
 @pytest.mark.parametrize("grism,grism_min,grism_max", TEST_GRISMS)
 def test_synthetic_spectrum_grism_bounds(grism, grism_min, grism_max):
     spectrum = generate_simulation_spectrum(grism)
-    assert_quantity_allclose(spectrum.wavelength.min().quantity, grism_min)
-    assert_quantity_allclose(spectrum.wavelength.max().quantity, grism_max)
+    assert_quantity_allclose(spectrum.wavelength.min().quantity, grism_min, rtol=1e-1)
+    assert_quantity_allclose(spectrum.wavelength.max().quantity, grism_max, rtol=1e-1)
 
 
 def test_single_chip_detector_warning():
