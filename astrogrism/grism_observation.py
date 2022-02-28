@@ -31,6 +31,9 @@ class GrismObs():
         else:
             raise TypeError("grism_image must be either a string filepath or FITS HDUList")
 
+        # Determine if the grism image used subarray mode
+        self.is_subarray = self.grism_image[0].header.get('SUBARRAY', False)
+
         # Read direct image file if string input
         if direct_image is None:
             self.direct_image = None
@@ -44,7 +47,7 @@ class GrismObs():
         # Parse grism image file header for meta info
         self.grism_header = self.grism_image["PRIMARY"].header
 
-        # Attempt to retrieve any information missing from the header (e.g. SIP)
+        # Attempt to retrieve any unspecified keywords from the header (e.g. SIP)
         # Should probably make these properties instead.
         if telescope is None:
             self.telescope = self.grism_header["TELESCOP"]
@@ -61,6 +64,18 @@ class GrismObs():
                 self.filter = self.grism_header["FILTER"]
             elif "FILTER1" in self.grism_header:
                 self.filter = self.grism_header["FILTER1"]
+            # Check to make sure we didn't retrieve something other than Gxxx from FILTER
+            if self.filter[0] != "G":
+                # try aperture
+                if "APERTURE" in self.grism_header:
+                    if self.grism_header["APERTURE"][0] == "G":
+                        self.filter = self.grism_header["APERTURE"]
+                        # Sometimes the grism is listed as G...-REF for some reason
+                        # As far as I'm aware it's not an important distiction for us
+                        self.filter = self.filter.replace("-REF", "")
+                    else:
+                        raise ValueError("Could not determine grism from FILTER or APERTURE"
+                                         " header keywords")
         else:
             self.filter = filter
 
@@ -72,6 +87,26 @@ class GrismObs():
             self.geometric_transforms["CCD2"] = self._build_geometric_transforms(channel=2)
         else:
             self.geometric_transforms = self._build_geometric_transforms()
+
+    def _calculate_subarray_offsets(self, instrument):
+
+        image_header = self.grism_image["SCI"].header
+        centera1 = image_header["CENTERA1"]
+        centera2 = image_header["CENTERA2"]
+        sizaxis1 = image_header["SIZAXIS1"]
+        sizaxis2 = image_header["SIZAXIS2"]
+
+        if instrument == "WFC3_UVIS":
+            x_offset = centera1 - (sizaxis1 / 2) - 1
+            # This accounts for serial_over from wf3tools.sub2full
+            y_offset = centera2 - (sizaxis2 / 2) - 26
+        elif instrument in ("WFC3_IR", "ACS_WFC"):
+            x_offset = centera1 - (sizaxis1 / 2) - 1
+            y_offset = centera2 - (sizaxis2 / 2) - 1
+        else:
+            raise ValueError(f"Subarrays not currently supported for {instrument}")
+
+        return x_offset, y_offset
 
     def _build_geometric_transforms(self, channel=None):
 
@@ -115,6 +150,13 @@ class GrismObs():
                                                        self.instrument,
                                                        filter)
 
+        # Calculate coordinate offsets if in subarray mode
+        if self.is_subarray:
+            x_offset, y_offset = self._calculate_subarray_offsets(instrument)
+        else:
+            x_offset = 0
+            y_offset = 0
+
         # Build the grism_detector <-> detector transforms
         with asdf.open(str(spec_wcs_file)) as f:
             specwcs = f.tree
@@ -135,7 +177,9 @@ class GrismObs():
                                                    lmodels=displ,
                                                    xmodels=invdispx,
                                                    ymodels=dispy,
-                                                   l_unit=l_unit)
+                                                   l_unit=l_unit,
+                                                   x_offset=x_offset,
+                                                   y_offset=y_offset)
         # TODO: Decide where to raise a warning if we can't do the backward
         # grism transformation (UVIS, at least for now).
         if invdispl is not None:
@@ -143,14 +187,18 @@ class GrismObs():
                                                                 lmodels=invdispl,
                                                                 xmodels=dispx,
                                                                 ymodels=dispy,
-                                                                l_unit=l_unit)
+                                                                l_unit=l_unit,
+                                                                x_offset=x_offset,
+                                                                y_offset=y_offset)
         else:
             det2det.inverse = AstrogrismBackwardGrismDispersion(orders,
                                                                 lmodels=displ,
                                                                 xmodels=dispx,
                                                                 ymodels=dispy,
                                                                 interpolate_t=True,
-                                                                l_unit=l_unit)
+                                                                l_unit=l_unit,
+                                                                x_offset=x_offset,
+                                                                y_offset=y_offset)
 
         grism_pipeline = [(gdetector, det2det)]
 
@@ -159,16 +207,18 @@ class GrismObs():
 
         # Get the correct hdu from the SIP file
         if channel is not None:
-            for i in range(len(sip_hdus)):
-                hdu = sip_hdus[i]
+            hdu_index = None
+            for i, hdu in enumerate(sip_hdus):
                 if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
                     sip_hdu_index = i
                     break
-            for i in range(len(self.grism_image)):
-                hdu = self.grism_image[i]
+            for i, hdu in enumerate(self.grism_image):
                 if "CCDCHIP" in hdu.header and hdu.header["CCDCHIP"] == channel:
                     hdu_index = i
                     break
+            if hdu_index is None:
+                # No HDU for this chip in this observation
+                return None
         else:
             hdu_index = 1
             sip_hdu_index = 1
