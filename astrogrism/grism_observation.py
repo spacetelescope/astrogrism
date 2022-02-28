@@ -32,10 +32,7 @@ class GrismObs():
             raise TypeError("grism_image must be either a string filepath or FITS HDUList")
 
         # Determine if the grism image used subarray mode
-        try:
-            self.is_subarray = self.grism_image[0].header['SUBARRAY']
-        except KeyError:
-            self.is_subarray = False
+        self.is_subarray = self.grism_image[0].header.get('SUBARRAY', False)
 
         # Read direct image file if string input
         if direct_image is None:
@@ -67,7 +64,7 @@ class GrismObs():
                 self.filter = self.grism_header["FILTER"]
             elif "FILTER1" in self.grism_header:
                 self.filter = self.grism_header["FILTER1"]
-            # Check to make sure we didn't something other than Gxxx from FILTER
+            # Check to make sure we didn't retrieve something other than Gxxx from FILTER
             if self.filter[0] != "G":
                 # try aperture
                 if "APERTURE" in self.grism_header:
