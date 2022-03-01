@@ -31,3 +31,8 @@ def test_single_chip_detector_warning():
 def test_invalid_detector():
     with pytest.raises(ValueError):
         generate_simulation_spectrum("G141", 3)
+
+
+def test_invalid_grism():
+    with pytest.raises(ValueError, match="Unrecognized grism:*"):
+        generate_simulation_spectrum("X999")
