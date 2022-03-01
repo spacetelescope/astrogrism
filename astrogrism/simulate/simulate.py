@@ -5,6 +5,7 @@ from tempfile import mkdtemp
 from warnings import warn
 
 from astropy.utils.data import download_file
+from synphot import Observation
 
 
 def generate_simulation_spectrum(grism, detector=None, temp_path=mkdtemp()):
@@ -66,7 +67,7 @@ def generate_simulation_spectrum(grism, detector=None, temp_path=mkdtemp()):
     else:
         raise ValueError(f"Unrecognized grism: {grism}. Valid grisms: G141, G102, G280, G800L")
 
-    spectrum = (bandpass * Vega).to_spectrum1d()
+    spectrum = Observation(Vega, bandpass, binset=bandpass.binset).to_spectrum1d()
 
     # Find the first value with a non-zero "flux"
     for i in range(len(spectrum.flux.value)):
