@@ -1,5 +1,6 @@
 from os import environ
 from pathlib import Path
+from shutil import copy
 from tarfile import open as tar_open
 from tempfile import mkdtemp
 from warnings import warn
@@ -38,14 +39,14 @@ def generate_simulation_spectrum(grism, detector=None, temp_path=mkdtemp()):
     # Always download our data files fresh. Ensures changes from redcat team will be picked up
     # Download HST Instrument Data Files
     SIM_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz')) # noqa
+    hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz', cache=True)) # noqa
     with tar_open(hst_data_files_archive) as tar:
         tar.extractall(path=SIM_DATA_DIR)
     # Download Vega CALSPEC Reference Atlas
     calspec_dir = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec'
     calspec_dir.mkdir(parents=True, exist_ok=True)
-    vega_reference_atlas = Path(download_file('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/alpha_lyr_stis_010.fits')) # noqa
-    vega_reference_atlas.replace(calspec_dir / 'alpha_lyr_stis_010.fits')
+    vega_reference_atlas = Path(download_file('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/alpha_lyr_stis_010.fits', cache=True)) # noqa
+    copy(str(vega_reference_atlas), str(calspec_dir / 'alpha_lyr_stis_010.fits'))
 
     # Now that we have all our reference files, we can import stsynphot
     # (This is why it's not a top-line import)
