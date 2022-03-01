@@ -2,14 +2,14 @@ from os import environ
 from pathlib import Path
 from shutil import copy
 from tarfile import open as tar_open
-from tempfile import mkdtemp
+from tempfile import gettempdir
 from warnings import warn
 
 from astropy.utils.data import download_file
 from synphot import Observation
 
 
-def generate_simulation_spectrum(grism, detector=None, temp_path=mkdtemp()):
+def generate_simulation_spectrum(grism, detector=None, temp_path=gettempdir()):
     """
     Initializes and uses STSynphot to generate a Vega spectrum within the bandpass of a given grism
 
