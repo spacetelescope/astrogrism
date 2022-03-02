@@ -43,10 +43,12 @@ def generate_simulation_spectrum(grism, detector=None, temp_path=gettempdir()):
     with tar_open(hst_data_files_archive) as tar:
         tar.extractall(path=SIM_DATA_DIR)
     # Download Vega CALSPEC Reference Atlas
-    calspec_dir = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec'
-    calspec_dir.mkdir(parents=True, exist_ok=True)
-    vega_reference_atlas = Path(download_file('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/alpha_lyr_stis_010.fits', cache=True)) # noqa
-    copy(str(vega_reference_atlas), str(calspec_dir / 'alpha_lyr_stis_010.fits'))
+    vega_reference_atlas_path = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec' / 'alpha_lyr_stis_010.fits'
+    # Check if it exists first before trying to download it
+    if not vega_reference_atlas_path.exists():
+        vega_reference_atlas_path.parent.mkdir(parents=True, exist_ok=True)
+        temp_download = Path(download_file('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/current_calspec/alpha_lyr_stis_010.fits', cache=True)) # noqa
+        copy(str(temp_download), str(vega_reference_atlas_path))
 
     # Now that we have all our reference files, we can import stsynphot
     # (This is why it's not a top-line import)
