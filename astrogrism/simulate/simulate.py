@@ -36,12 +36,14 @@ def generate_simulation_spectrum(grism, detector=None, temp_path=gettempdir()):
     # Prepare environment required for stsynphot to be imported
     environ['PYSYN_CDBS'] = str(SIM_DATA_DIR / 'grp' / 'redcat' / 'trds')
 
-    # Always download our data files fresh. Ensures changes from redcat team will be picked up
-    # Download HST Instrument Data Files
+    # Download HST Instrument Data Archive
     SIM_DATA_DIR.mkdir(parents=True, exist_ok=True)
     hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz', cache=True)) # noqa
     with tar_open(hst_data_files_archive) as tar:
-        tar.extractall(path=SIM_DATA_DIR)
+        # Only extract the files that are missing
+        for file in tar:
+            if not (SIM_DATA_DIR / Path(file.name)).exists():
+                tar.extract(file, path=SIM_DATA_DIR)
     # Download Vega CALSPEC Reference Atlas
     vega_reference_atlas_path = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec' / 'alpha_lyr_stis_010.fits'
     # Check if it exists first before trying to download it
