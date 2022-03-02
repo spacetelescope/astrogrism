@@ -45,7 +45,7 @@ def generate_simulation_spectrum(grism, detector=None, temp_path=gettempdir()):
             if not (SIM_DATA_DIR / Path(file.name)).exists():
                 tar.extract(file, path=SIM_DATA_DIR)
     # Download Vega CALSPEC Reference Atlas
-    vega_reference_atlas_path = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec' / 'alpha_lyr_stis_010.fits'
+    vega_reference_atlas_path = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec' / 'alpha_lyr_stis_010.fits' # noqa
     # Check if it exists first before trying to download it
     if not vega_reference_atlas_path.exists():
         vega_reference_atlas_path.parent.mkdir(parents=True, exist_ok=True)
