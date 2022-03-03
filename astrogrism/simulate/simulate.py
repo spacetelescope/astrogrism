@@ -103,7 +103,7 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir(), ve
     return spectrum[min_slice:max_slice]
 
 
-def _disperse_spectrum_on_image(grism, wide_field_image, spectrum):
+def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
     #if Path(wide_field_image).is_file:
 
     grismobs = GrismObs(grism)
@@ -138,4 +138,4 @@ def _disperse_spectrum_on_image(grism, wide_field_image, spectrum):
 
 def simulate_grism(grism, wide_field_image):
     spectrum = generate_simulation_spectrum(grism)
-    _disperse_spectrum_on_image(grism, wide_field_image, spectrum)
+    disperse_spectrum_on_image(grism, wide_field_image, spectrum)
