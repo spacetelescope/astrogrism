@@ -107,6 +107,7 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
     #if Path(wide_field_image).is_file:
 
     grismobs = GrismObs(grism)
+    image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
 
     shape = wide_field_image['SCI'].data.shape
     simulated_data = np.zeroes(shape)
@@ -118,13 +119,12 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
             data_flux = wide_field_image['SCI'].data[horizontal][vertical]
 
             # For each Wavelength in the spectrum, calculate where, in pixels, that wavelength would fall on the detector
-            image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
-            for wavelength in spectrum:
-                spectrum_flux = spectrum[wavelength]
-                #TBF: What is xcenter/ycenter in this context??
-                dispersion = image2grism.evaluate(x_center, y_center, wavelength, 1)
-                x = (dispersion[0])
-                y = (dispersion[1])
+            dispersed_coords = image2grism.evaluate(x_pixel, y_pixel, spectrum.wavelength.value, 1)
+            for step in range(0, len(spectrum.wavelength)):
+                spectrum_flux = spectrum.flux[step]
+
+                dispersed_x = dispersed_coords[0][step]
+                dispersed_y = dispersed_coords[1][step]
 
                 # If the dispersed position of the wavelength is inside the bounds of the image, write the spectrum
                 if (0 < dispersed_x < simulated_data.shape[0]) and (0 < dispersed_y < simulated_data.shape[1]):
