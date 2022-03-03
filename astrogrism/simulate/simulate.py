@@ -127,7 +127,7 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
                 y = (dispersion[1])
 
                 # If the dispersed position of the wavelength is inside the bounds of the image, write the spectrum
-                if x in range(0, simulated_data.shape[0]) and y in range(0, simulated_data.shape[1]):
+                if (0 < dispersed_x < simulated_data.shape[0]) and (0 < dispersed_y < simulated_data.shape[1]):
                     # Scale the flux of the spectrum to the brightness of the original pixel
                     # NOTE: Is floor the right approach to determine which pixel to write to? Maybe sufficient until we accomplish the "drizzling" part of the simulation?
                     # TBF: How to properly index a 3D numpy array?
