@@ -110,6 +110,7 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
     image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
 
     shape = wide_field_image[1].data.shape
+    simulated_data = np.zeros(shape)
     # For each pixel in the science image, we need to disperse it's spectrum
     for x_pixel in range(0, shape[0]):
         for y_pixel in range(0, shape[1]):
