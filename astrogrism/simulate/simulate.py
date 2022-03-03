@@ -10,6 +10,7 @@ from astropy.utils.data import download_file
 from synphot import Observation
 from astropy.wcs import WCS
 import numpy as np
+import progressbar
 
 from astrogrism import GrismObs
 
@@ -111,8 +112,14 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
 
     shape = wide_field_image[1].data.shape
     simulated_data = np.zeros(shape)
+
+    # Start progressbar
+    bar = progressbar.ProgressBar(maxval=shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    bar.start()
+
     # For each pixel in the science image, we need to disperse it's spectrum
     for x_pixel in range(0, shape[0]):
+        bar.update(x_pixel)
         for y_pixel in range(0, shape[1]):
             # Get the flux of the science pixel; we'll need to scale the spectrum to this brightness
             data_flux = wide_field_image[1].data[x_pixel][y_pixel]
@@ -120,7 +127,7 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
                 continue
 
             # For each Wavelength in the spectrum, calculate where, in pixels, that wavelength would fall on the detector
-            dispersed_coords = image2grism.evaluate(x_pixel, y_pixel, spectrum.wavelength.value, 1)
+            dispersed_coords = image2grism.evaluate(x_pixel, y_pixel, spectrum.wavelength, 1)
             for step in range(0, len(spectrum.wavelength)):
                 spectrum_flux = spectrum.flux[step]
 
@@ -132,7 +139,7 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
                     # Scale the flux of the spectrum to the brightness of the original pixel
                     # NOTE: Is floor the right approach to determine which pixel to write to? Maybe sufficient until we accomplish the "drizzling" part of the simulation?
                     simulated_data[floor(dispersed_x)][floor(dispersed_y)] = simulated_data[floor(dispersed_x)][floor(dispersed_y)] + (data_flux * spectrum_flux).value
-
+    bar.finish()
     return simulated_data
 
 
