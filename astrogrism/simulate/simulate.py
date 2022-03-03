@@ -109,14 +109,12 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
     grismobs = GrismObs(grism)
     image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
 
-    shape = wide_field_image['SCI'].data.shape
-    simulated_data = np.zeroes(shape)
-    wcs = WCS(wide_field_image['SCI'].header)
+    shape = wide_field_image[1].data.shape
     # For each pixel in the science image, we need to disperse it's spectrum
-    for horizontal in range(0, shape[0]):
-        for vertical in range(0, shape[1]):
+    for x_pixel in range(0, shape[0]):
+        for y_pixel in range(0, shape[1]):
             # Get the flux of the science pixel; we'll need to scale the spectrum to this brightness
-            data_flux = wide_field_image['SCI'].data[horizontal][vertical]
+            data_flux = wide_field_image[1].data[x_pixel][y_pixel]
 
             # For each Wavelength in the spectrum, calculate where, in pixels, that wavelength would fall on the detector
             dispersed_coords = image2grism.evaluate(x_pixel, y_pixel, spectrum.wavelength.value, 1)
