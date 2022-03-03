@@ -130,8 +130,7 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
                 if (0 < dispersed_x < simulated_data.shape[0]) and (0 < dispersed_y < simulated_data.shape[1]):
                     # Scale the flux of the spectrum to the brightness of the original pixel
                     # NOTE: Is floor the right approach to determine which pixel to write to? Maybe sufficient until we accomplish the "drizzling" part of the simulation?
-                    # TBF: How to properly index a 3D numpy array?
-                    simulated_data[(floor(x),floor(y))] = data_flux * spectrum_flux
+                    simulated_data[floor(dispersed_x)][floor(dispersed_y)] = simulated_data[floor(dispersed_x)][floor(dispersed_y)] + (data_flux * spectrum_flux).value
 
     return simulated_data
 
