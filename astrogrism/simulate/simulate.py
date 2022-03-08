@@ -130,7 +130,7 @@ def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=
     if detector:
         image2grism = grismobs.geometric_transforms[f'CCD{detector}'].get_transform('detector', 'grism_detector')
     else:
-    image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
+        image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
 
     if type(wide_field_image) is ImageHDU:
         data = wide_field_image.data
