@@ -127,7 +127,7 @@ def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
                 continue
 
             # For each Wavelength in the spectrum, calculate where, in pixels, that wavelength would fall on the detector
-            dispersed_coords = image2grism.evaluate(x_pixel, y_pixel, spectrum.wavelength, 1)
+            dispersed_coords = image2grism(x_pixel, y_pixel, spectrum.wavelength, 1)
             for step in range(0, len(spectrum.wavelength)):
                 spectrum_flux = spectrum.flux[step]
 
