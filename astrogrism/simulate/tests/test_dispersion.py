@@ -11,6 +11,7 @@ grism_detectors = [
     ('G800L', 2)
 ]
 
+
 @pytest.mark.parametrize("grism,detector", grism_detectors)
 def test_sim_sum(grism, detector):
     # Generate spectrum and sum the total flux through the bandpass
@@ -19,8 +20,8 @@ def test_sim_sum(grism, detector):
 
     # Simulate Grism Observation
     # Create an arbitrarily large field with a single point in the center of flux 1
-    data = np.zeros((4000,500))
-    data[2000,250] = 1
+    data = np.zeros((4000, 500))
+    data[2000, 250] = 1
     # Simulate grism observation and sum the dispersed flux
     simulation = simulate_grism(grism, data, detector)
     dispersed_sum = np.sum(simulation)

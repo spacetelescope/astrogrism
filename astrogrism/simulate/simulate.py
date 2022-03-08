@@ -120,14 +120,16 @@ def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=
 
     spectrum : specutils.Spectrum1D
         The spectrum to diperse the on the supplied image
-    
+
     detector : int
         For detectors with multiple chips, specifies which chip to simulate
         Only useful for G280 and G800L Grisms
     """
     grismobs = GrismObs(grism_file)
     if detector:
-        image2grism = grismobs.geometric_transforms[f'CCD{detector}'].get_transform('detector', 'grism_detector')
+        image2grism = grismobs.geometric_transforms[f'CCD{detector}'].get_transform('detector',
+                                                                                    'grism_detector'
+                                                                                    )
     else:
         image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
 
@@ -135,24 +137,31 @@ def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=
         data = wide_field_image.data
     else:
         data = wide_field_image
-    
+
     shape = data.shape
     simulated_data = np.zeros(shape)
 
     # Start progressbar
-    bar = progressbar.ProgressBar(maxval=shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    bar = progressbar.ProgressBar(maxval=shape[0],
+                                  widgets=[progressbar.Bar('=', '[', ']'),
+                                           ' ',
+                                           progressbar.Percentage()
+                                           ]
+                                  )
     bar.start()
 
     # For each pixel in the science image, we need to disperse it's spectrum
     for x_pixel in range(0, shape[0]):
         bar.update(x_pixel)
         for y_pixel in range(0, shape[1]):
-            # Get the flux of the science pixel; we'll need to scale the spectrum to this brightness
+            # Get the flux of the science pixel
+            # We'll need to scale the spectrum to this brightness later
             data_flux = data[x_pixel][y_pixel]
             if np.isnan(data_flux) or (data_flux == 0):
                 continue
 
-            # For each Wavelength in the spectrum, calculate where, in pixels, that wavelength would fall on the detector
+            # For each Wavelength in the spectrum,
+            # calculate where, in pixels, that wavelength would fall on the detector
             dispersed_coords = image2grism(x_pixel, y_pixel, spectrum.wavelength, 1)
             for step in range(0, len(spectrum.wavelength)):
                 spectrum_flux = spectrum.flux[step]
@@ -160,11 +169,12 @@ def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=
                 dispersed_x = dispersed_coords[0][step]
                 dispersed_y = dispersed_coords[1][step]
 
-                # If the dispersed position of the wavelength is inside the bounds of the image, write the spectrum
-                if (0 < dispersed_x < simulated_data.shape[0]) and (0 < dispersed_y < simulated_data.shape[1]):
+                # If the dispersed position of the wavelength is inside the bounds of the image,
+                # write the spectrum
+                if (0 < dispersed_x < simulated_data.shape[0]) and (0 < dispersed_y < simulated_data.shape[1]): # noqa
                     # Scale the flux of the spectrum to the brightness of the original pixel
-                    # NOTE: Is floor the right approach to determine which pixel to write to? Maybe sufficient until we accomplish the "drizzling" part of the simulation?
-                    simulated_data[floor(dispersed_x)][floor(dispersed_y)] = simulated_data[floor(dispersed_x)][floor(dispersed_y)] + (data_flux * spectrum_flux).value
+                    # TBF: Substitute floor with proper subpixel drizzling
+                    simulated_data[floor(dispersed_x)][floor(dispersed_y)] += (data_flux * spectrum_flux).value # noqa
     bar.finish()
     return simulated_data
 
@@ -197,6 +207,6 @@ def simulate_grism(grism, wide_field_image, detector=None):
         grism_file = test_data_dir / 'acs_test_file.fits'
     else:
         raise ValueError(f"Unrecognized grism: {grism}. Valid grisms: G141, G102, G280, G800L")
-    
+
     spectrum = generate_simulation_spectrum(grism, detector)
     return disperse_spectrum_on_image(str(grism_file), wide_field_image, spectrum, detector)
