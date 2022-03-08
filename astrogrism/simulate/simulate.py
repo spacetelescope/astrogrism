@@ -104,10 +104,12 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir(), ve
     return spectrum[min_slice:max_slice]
 
 
-def disperse_spectrum_on_image(grism, wide_field_image, spectrum):
-    #if Path(wide_field_image).is_file:
+def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=None):
 
-    grismobs = GrismObs(grism)
+    grismobs = GrismObs(grism_file)
+    if detector:
+        image2grism = grismobs.geometric_transforms[f'CCD{detector}'].get_transform('detector', 'grism_detector')
+    else:
     image2grism = grismobs.geometric_transforms.get_transform('detector', 'grism_detector')
 
     if type(wide_field_image) is ImageHDU:
