@@ -106,7 +106,26 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir(), ve
 
 
 def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=None):
+    """
+    Disperses a given spectrum onto an astronomical image
+    along the spectral trace of a specified HST grism
 
+    Parameters
+    ----------
+    grism_file : str or astropy.io.fits.HDUList
+        Grism image (or filepath to one) to construct an Astrogrism GrismObs class
+        TBF: Should be replaced with a Grism identifier only in the future
+
+    wide_field_image : numpy.ndarray or astropy.io.fits.ImageHDU
+        The image or array to disperse the given spectrum atop
+
+    spectrum : specutils.Spectrum1D
+        The spectrum to diperse the on the supplied image
+    
+    detector : int
+        For detectors with multiple chips, specifies which chip to simulate
+        Only useful for G280 and G800L Grisms
+    """
     grismobs = GrismObs(grism_file)
     if detector:
         image2grism = grismobs.geometric_transforms[f'CCD{detector}'].get_transform('detector', 'grism_detector')
