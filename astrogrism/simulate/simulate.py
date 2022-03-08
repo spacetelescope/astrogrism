@@ -170,6 +170,34 @@ def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=
     return simulated_data
 
 
-def simulate_grism(grism, wide_field_image):
-    spectrum = generate_simulation_spectrum(grism)
-    disperse_spectrum_on_image(grism, wide_field_image, spectrum)
+def simulate_grism(grism, wide_field_image, detector=None):
+    """
+    Simulates a grism observation on an astronomical image given a specific grism
+
+    Parameters
+    ----------
+    grism : str
+        String representation of one of the four supported HST Grisms
+        Valid grisms: G141, G102, G280, G800L
+
+    wide_field_image : numpy.ndarray or astropy.io.fits.ImageHDU
+        The image or array to disperse the given spectrum atop
+
+    detector : int
+        For detectors with multiple chips, specifies which chip to simulate
+        Only useful for G280 and G800L Grisms
+    """
+    test_data_dir = Path(__file__).parent.parent.absolute() / 'tests' / 'data'
+    if grism == 'G102':
+        grism_file = test_data_dir / 'IRG102_icwz15e7q_flt.fits'
+    elif grism == 'G141':
+        grism_file = test_data_dir / 'IRG141_ib6o23rsq_flt.fits'
+    elif grism == 'G280':
+        grism_file = test_data_dir / 'uvis_test_file.fits'
+    elif grism == 'G800L':
+        grism_file = test_data_dir / 'acs_test_file.fits'
+    else:
+        raise ValueError(f"Unrecognized grism: {grism}. Valid grisms: G141, G102, G280, G800L")
+    
+    spectrum = generate_simulation_spectrum(grism, detector)
+    return disperse_spectrum_on_image(str(grism_file), wide_field_image, spectrum, detector)
