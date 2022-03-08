@@ -130,8 +130,8 @@ def disperse_spectrum_on_image(grism_file, wide_field_image, spectrum, detector=
         bar.update(x_pixel)
         for y_pixel in range(0, shape[1]):
             # Get the flux of the science pixel; we'll need to scale the spectrum to this brightness
-            data_flux = wide_field_image[1].data[x_pixel][y_pixel]
-            if np.isnan(data_flux):
+            data_flux = data[x_pixel][y_pixel]
+            if np.isnan(data_flux) or (data_flux == 0):
                 continue
 
             # For each Wavelength in the spectrum, calculate where, in pixels, that wavelength would fall on the detector
