@@ -7,6 +7,7 @@ from tempfile import gettempdir
 from warnings import warn
 
 from astropy.utils.data import download_file
+from astropy.io.fits import ImageHDU
 from synphot import Observation
 from astropy.wcs import WCS
 import numpy as np
