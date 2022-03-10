@@ -52,10 +52,10 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir()):
         if not vega_reference_atlas_path.exists():
             vega_reference_atlas_path.parent.mkdir(parents=True, exist_ok=True)
             archive_url = ('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/'
-                        'current_calspec/alpha_lyr_stis_010.fits')
+                           'current_calspec/alpha_lyr_stis_010.fits')
             temp_download = Path(download_file(archive_url, cache=True))
             copy(str(temp_download), str(vega_reference_atlas_path))
-    
+
     _download_stsynphot_files(temp_path)
 
     # Now that we have all our reference files, we can import stsynphot
