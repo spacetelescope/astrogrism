@@ -9,7 +9,7 @@ from astropy.utils.data import download_file
 from synphot import Observation
 
 
-def generate_simulation_spectrum(grism, detector=None, temp_path=gettempdir()):
+def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir()):
     """
     Initializes and uses STSynphot to generate a Vega spectrum within the bandpass of a given grism
 

@@ -1,4 +1,4 @@
-from astrogrism.simulate import generate_simulation_spectrum
+from astrogrism.simulate import generate_synthetic_spectrum
 
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
@@ -15,24 +15,24 @@ TEST_GRISMS = [
 
 @pytest.mark.parametrize("grism,grism_min,grism_max", TEST_GRISMS)
 def test_synthetic_spectrum_grism_bounds(grism, grism_min, grism_max):
-    spectrum = generate_simulation_spectrum(grism)
+    spectrum = generate_synthetic_spectrum(grism)
     assert_quantity_allclose(spectrum.wavelength.min().quantity, grism_min, rtol=1e-1)
     assert_quantity_allclose(spectrum.wavelength.max().quantity, grism_max, rtol=1e-1)
 
 
 def test_single_chip_detector_warning():
     with pytest.warns(RuntimeWarning, match="grism does not have multiple detectors."):
-        generate_simulation_spectrum('G141', detector=1)
+        generate_synthetic_spectrum('G141', detector=1)
 
     with pytest.warns(RuntimeWarning, match="grism does not have multiple detectors"):
-        generate_simulation_spectrum('G102', detector=2)
+        generate_synthetic_spectrum('G102', detector=2)
 
 
 def test_invalid_detector():
     with pytest.raises(ValueError, match="Invalid detector"):
-        generate_simulation_spectrum("G141", 3)
+        generate_synthetic_spectrum("G141", 3)
 
 
 def test_invalid_grism():
     with pytest.raises(ValueError, match="Unrecognized grism"):
-        generate_simulation_spectrum("X999")
+        generate_synthetic_spectrum("X999")
