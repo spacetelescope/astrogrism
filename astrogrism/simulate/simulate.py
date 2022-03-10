@@ -9,6 +9,30 @@ from astropy.utils.data import download_file
 from synphot import Observation
 
 
+def _download_stsynphot_files(download_path):
+
+    # Prepare environment required for stsynphot to be imported
+    environ['PYSYN_CDBS'] = str(download_path / 'grp' / 'redcat' / 'trds')
+
+    # Download HST Instrument Data Archive
+    download_path.mkdir(parents=True, exist_ok=True)
+    hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz', cache=True)) # noqa
+    with tar_open(hst_data_files_archive) as tar:
+        # Only extract the files that are missing
+        for file in tar:
+            if not (download_path / Path(file.name)).exists():
+                tar.extract(file, path=download_path)
+    # Download Vega CALSPEC Reference Atlas
+    vega_reference_atlas_path = download_path / 'grp' / 'redcat' / 'trds' / 'calspec' / 'alpha_lyr_stis_010.fits' # noqa
+    # Check if it exists first before trying to download it
+    if not vega_reference_atlas_path.exists():
+        vega_reference_atlas_path.parent.mkdir(parents=True, exist_ok=True)
+        archive_url = ('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/'
+                        'current_calspec/alpha_lyr_stis_010.fits')
+        temp_download = Path(download_file(archive_url, cache=True))
+        copy(str(temp_download), str(vega_reference_atlas_path))
+
+
 def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir()):
     """
     Initializes and uses STSynphot to generate a Vega spectrum within the bandpass of a given grism
@@ -28,35 +52,12 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir()):
         default temporary folder location
 
     """
+    if detector not in (1, 2, None):
+        raise ValueError("Invalid detector argument. Please choose 1 or 2")
+
     SIM_DATA_DIR = Path(temp_path) / "astrogrism_simulation_files"
 
-    def _download_stsynphot_files(temp_path):
-
-        if detector not in (1, 2, None):
-            raise ValueError("Invalid detector argument. Please choose 1 or 2")
-
-        # Prepare environment required for stsynphot to be imported
-        environ['PYSYN_CDBS'] = str(SIM_DATA_DIR / 'grp' / 'redcat' / 'trds')
-
-        # Download HST Instrument Data Archive
-        SIM_DATA_DIR.mkdir(parents=True, exist_ok=True)
-        hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz', cache=True)) # noqa
-        with tar_open(hst_data_files_archive) as tar:
-            # Only extract the files that are missing
-            for file in tar:
-                if not (SIM_DATA_DIR / Path(file.name)).exists():
-                    tar.extract(file, path=SIM_DATA_DIR)
-        # Download Vega CALSPEC Reference Atlas
-        vega_reference_atlas_path = SIM_DATA_DIR / 'grp' / 'redcat' / 'trds' / 'calspec' / 'alpha_lyr_stis_010.fits' # noqa
-        # Check if it exists first before trying to download it
-        if not vega_reference_atlas_path.exists():
-            vega_reference_atlas_path.parent.mkdir(parents=True, exist_ok=True)
-            archive_url = ('https://archive.stsci.edu/hlsps/reference-atlases/cdbs/'
-                           'current_calspec/alpha_lyr_stis_010.fits')
-            temp_download = Path(download_file(archive_url, cache=True))
-            copy(str(temp_download), str(vega_reference_atlas_path))
-
-    _download_stsynphot_files(temp_path)
+    _download_stsynphot_files(SIM_DATA_DIR)
 
     # Now that we have all our reference files, we can import stsynphot
     # (This is why it's not a top-line import)
