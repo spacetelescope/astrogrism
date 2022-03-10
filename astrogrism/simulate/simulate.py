@@ -33,7 +33,7 @@ def _download_stsynphot_files(download_path):
         copy(str(temp_download), str(vega_reference_atlas_path))
 
 
-def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir()):
+def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir(), verbose=False):
     """
     Initializes and uses STSynphot to generate a Vega spectrum within the bandpass of a given grism
 
@@ -63,12 +63,12 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir()):
     # (This is why it's not a top-line import)
     from stsynphot import Vega, band # noqa
     if grism == 'G141':
-        if detector:
+        if detector and verbose:
             warn("WFC3's G141 grism does not have multiple detectors. Ignoring detector argument",
                  RuntimeWarning)
         bandpass = band('wfc3,ir,g141')
     elif grism == 'G102':
-        if detector:
+        if detector and verbose:
             warn("WFC3's G102 grism does not have multiple detectors. Ignoring detector argument",
                  RuntimeWarning)
         bandpass = band('wfc3,ir,g102')

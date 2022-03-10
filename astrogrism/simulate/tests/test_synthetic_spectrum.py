@@ -22,10 +22,10 @@ def test_synthetic_spectrum_grism_bounds(grism, grism_min, grism_max):
 
 def test_single_chip_detector_warning():
     with pytest.warns(RuntimeWarning, match="grism does not have multiple detectors."):
-        generate_synthetic_spectrum('G141', detector=1)
+        generate_synthetic_spectrum('G141', detector=1, verbose=True)
 
     with pytest.warns(RuntimeWarning, match="grism does not have multiple detectors"):
-        generate_synthetic_spectrum('G102', detector=2)
+        generate_synthetic_spectrum('G102', detector=2, verbose=True)
 
 
 def test_invalid_detector():
