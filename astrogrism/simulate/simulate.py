@@ -213,5 +213,5 @@ def simulate_grism(grism, wide_field_image, detector=None, spectrum=None):
         raise ValueError(f"Unrecognized grism: {grism}. Valid grisms: G141, G102, G280, G800L")
 
     if not spectrum:
-        spectrum = generate_simulation_spectrum(grism, detector)
+        spectrum = generate_synthetic_spectrum(grism, detector)
     return disperse_spectrum_on_image(str(grism_file), wide_field_image, spectrum, detector)

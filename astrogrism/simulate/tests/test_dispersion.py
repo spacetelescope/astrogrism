@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from astrogrism.simulate import generate_simulation_spectrum, simulate_grism
+from astrogrism.simulate import generate_synthetic_spectrum, simulate_grism
 
 grism_detectors = [
     ('G141', None),
@@ -15,7 +15,7 @@ grism_detectors = [
 @pytest.mark.parametrize("grism,detector", grism_detectors)
 def test_sim_sum(grism, detector):
     # Generate spectrum and sum the total flux through the bandpass
-    spectrum = generate_simulation_spectrum(grism, detector)
+    spectrum = generate_synthetic_spectrum(grism, detector)
     expected_sum = np.sum(spectrum.flux.value)
 
     # Simulate Grism Observation
