@@ -62,7 +62,7 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir(), ve
 
     # Now that we have all our reference files, we can import stsynphot
     # (This is why it's not a top-line import)
-    from stsynphot import Vega, band # noqa
+    from stsynphot import Vega, band
     if grism == 'G141':
         if detector and verbose:
             warn("WFC3's G141 grism does not have multiple detectors. Ignoring detector argument",
