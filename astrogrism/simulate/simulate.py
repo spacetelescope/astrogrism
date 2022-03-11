@@ -9,7 +9,7 @@ from astropy.utils.data import download_file
 from synphot import Observation
 
 
-def _download_stsynphot_files(download_path):
+def download_stsynphot_files(download_path):
 
     # Prepare environment required for stsynphot to be imported
     environ['PYSYN_CDBS'] = str(download_path / 'grp' / 'redcat' / 'trds')
@@ -58,7 +58,7 @@ def generate_synthetic_spectrum(grism, detector=None, temp_path=gettempdir(), ve
 
     SIM_DATA_DIR = Path(temp_path) / "astrogrism_simulation_files"
 
-    _download_stsynphot_files(SIM_DATA_DIR)
+    download_stsynphot_files(SIM_DATA_DIR)
 
     # Now that we have all our reference files, we can import stsynphot
     # (This is why it's not a top-line import)
