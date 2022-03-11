@@ -16,14 +16,15 @@ def _download_stsynphot_files(download_path):
 
     # Download HST Instrument Data Archive
     download_path.mkdir(parents=True, exist_ok=True)
-    hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/trds/tarfiles/synphot1.tar.gz', cache=True)) # noqa
+    hst_data_files_archive = Path(download_file('https://ssb.stsci.edu/'
+                                                'trds/tarfiles/synphot1.tar.gz', cache=True))
     with tar_open(hst_data_files_archive) as tar:
         # Only extract the files that are missing
         for file in tar:
             if not (download_path / Path(file.name)).exists():
                 tar.extract(file, path=download_path)
     # Download Vega CALSPEC Reference Atlas
-    vega_reference_atlas_path = download_path / 'grp' / 'redcat' / 'trds' / 'calspec' / 'alpha_lyr_stis_010.fits' # noqa
+    vega_reference_atlas_path = download_path / 'grp/redcat/trds/calspec/alpha_lyr_stis_010.fits'
     # Check if it exists first before trying to download it
     if not vega_reference_atlas_path.exists():
         vega_reference_atlas_path.parent.mkdir(parents=True, exist_ok=True)
