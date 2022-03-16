@@ -10,7 +10,7 @@ except ModuleNotFoundError as e:
                               "reference files for HST. Try `pip install "
                               "jwst` and try again!") from e
 
-from astrogrism.HST.reference_file_generators.common import common_reference_file_keywords
+from .common import common_reference_file_keywords
 
 
 def create_tsgrism_wavelengthrange(outname="wfc3_tsgrism_wavelengthrange.asdf",
