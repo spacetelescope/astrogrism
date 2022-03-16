@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from astrogrism.config.HST.reference_file_generators import create_grism_specwcs  # noqa
-from astrogrism.config.HST.reference_file_generators import create_tsgrism_wavelengthrange  # noqa
+from astrogrism.HST.reference_file_generators import create_grism_specwcs  # noqa
+from astrogrism.HST.reference_file_generators import create_tsgrism_wavelengthrange  # noqa
 # from astrogrism.config.HST.reference_file_generators.reference_file_generators._generate_distortion import create_distortion  # noqa
 
 
