@@ -8,7 +8,7 @@ from astropy.modeling.models import Polynomial1D
 from astropy import units as u
 
 from astrogrism.HST.dispersion_models import DISPXY_Model, DISPXY_Extension
-from astrogrism.config.HST.reference_file_generators._common import common_reference_file_keywords
+from astrogrism.config.HST.reference_file_generators.common import common_reference_file_keywords
 from astrogrism.config.HST.reference_file_generators.wcs_ref_model import WFC3GrismModel
 
 
