@@ -15,10 +15,8 @@ except ModuleNotFoundError as e:
 from .common import common_reference_file_keywords
 
 
-def create_grism_wavelengthrange(grism, chip=None,
-                                 outname="wfc3_grism_wavelengthrange.asdf",
-                                 author="STScI", wavelengthrange=None,
-                                 extract_orders=None):
+def create_grism_wavelengthrange(grism, chip=None, author="STScI",
+                                 wavelengthrange=None, extract_orders=None):
     """Create a wavelengthrange reference file for specified grism.
 
     Parameters
@@ -36,16 +34,6 @@ def create_grism_wavelengthrange(grism, chip=None,
         A list of lists that specify
 
     """
-    ref_kw = common_reference_file_keywords(reftype="wavelengthrange",
-                                            title="Grism reference file",
-                                            description=f"{grism}{chip} Wavelength Ranges",
-                                            exp_type="GRISM",
-                                            author=author,
-                                            pupil="ANY",
-                                            model_type="WavelengthrangeModel",
-                                            filename=outname,
-                                            )
-
     history = f"{grism} wavelengthrange"
 
     acs_order_dict = {"A": 1, "B": 0, "C": 2, "D": 3, "E": -1, "F": -2, "G": -3}
@@ -55,10 +43,25 @@ def create_grism_wavelengthrange(grism, chip=None,
 
     if grism == "G800L":
         chip_str = f"CHIP{chip}"
+        outname = f"ACS_G800L_CCD{chip}_wavelengthrange.asdf"
     elif grism == "G280":
         chip_str = f"UVIS{chip}"
+        outname = f"WFC3_G280_CCD{chip}_wavelengthrange.asdf"
     elif grism in ("G102", "G141"):
         chip_str = "IR"
+        outname = f"WFC3_{grism}_wavelengthrange.asdf"
+    else:
+        raise ValueError(f"Grism {grism} is not currently supported.")
+
+    ref_kw = common_reference_file_keywords(reftype="wavelengthrange",
+                                            title="Grism reference file",
+                                            description=f"{grism}{chip} Wavelength Ranges",
+                                            exp_type="GRISM",
+                                            author=author,
+                                            pupil="ANY",
+                                            model_type="WavelengthrangeModel",
+                                            filename=outname,
+                                            )
 
     if wavelengthrange is None:
         # This is a list of tuples that specify the
