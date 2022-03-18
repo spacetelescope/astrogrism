@@ -1,4 +1,6 @@
+import csv
 import datetime
+import pkg_resources
 
 from asdf.tags.core import Software, HistoryEntry
 from astropy import units as u
@@ -13,12 +15,9 @@ except ModuleNotFoundError as e:
 from .common import common_reference_file_keywords
 
 
-def create_tsgrism_wavelengthrange(outname="wfc3_tsgrism_wavelengthrange.asdf",
-                                   history="WFC3 TSGrism wavelengthrange",
-                                   author="STScI",
-                                   wavelengthrange=None,
-                                   extract_orders=None):
-    """Create a wavelengthrange reference file for WFC3 TSGRISM mode.
+def create_grism_wavelengthrange(grism, chip=None, author="STScI",
+                                 wavelengthrange=None, extract_orders=None):
+    """Create a wavelengthrange reference file for specified grism.
 
     Parameters
     ----------
@@ -35,10 +34,29 @@ def create_tsgrism_wavelengthrange(outname="wfc3_tsgrism_wavelengthrange.asdf",
         A list of lists that specify
 
     """
+    history = f"{grism} wavelengthrange"
+
+    acs_order_dict = {"A": 1, "B": 0, "C": 2, "D": 3, "E": -1, "F": -2, "G": -3}
+
+    if chip is None and grism in ("G800L", "G280"):
+        raise ValueError("Must specify chip 1 or 2")
+
+    if grism == "G800L":
+        chip_str = f"CHIP{chip}"
+        outname = f"ACS_G800L_CCD{chip}_wavelengthrange.asdf"
+    elif grism == "G280":
+        chip_str = f"UVIS{chip}"
+        outname = f"WFC3_G280_CCD{chip}_wavelengthrange.asdf"
+    elif grism in ("G102", "G141"):
+        chip_str = "IR"
+        outname = f"WFC3_{grism}_wavelengthrange.asdf"
+    else:
+        raise ValueError(f"Grism {grism} is not currently supported.")
+
     ref_kw = common_reference_file_keywords(reftype="wavelengthrange",
-                                            title="WFC3 TSGRISM reference file",
-                                            description="WFC3 Grism-Filter Wavelength Ranges",
-                                            exp_type="WFC3_TSGRISM",
+                                            title="Grism reference file",
+                                            description=f"{grism}{chip} Wavelength Ranges",
+                                            exp_type="GRISM",
                                             author=author,
                                             pupil="ANY",
                                             model_type="WavelengthrangeModel",
@@ -48,29 +66,32 @@ def create_tsgrism_wavelengthrange(outname="wfc3_tsgrism_wavelengthrange.asdf",
     if wavelengthrange is None:
         # This is a list of tuples that specify the
         # order, filter, wave min, wave max
-        wavelengthrange = [(-1, 'G102', 0.7488958984375, 1.1496958984375),
-                           (0, 'G102', 0.7401, 1.2297),
-                           (1, 'G102', 0.7496, 1.1979),
-                           (2, 'G102', 0.7401, 1.1897),
-                           (3, 'G102', 0.7571, 0.9878),
-                           (-1, 'G141', 1.031, 1.7845),
-                           (0, 'G141', 1.0402, 1.6998),
-                           (1, 'G141', 0.9953, 1.7697),
-                           (2, 'G141', 0.9702, 1.5903),
-                           (3, 'G141', 1.0068, 1.3875),
-                           (4, 'G141', 1.031, 1.7845),
-                           ]
+        wavelengthrange = []
+        waverange_tab = "config/common/WFSS_Wavelength_Range_V1.1_with_ACS.tab"
+        waverange_fname = pkg_resources.resource_filename("astrogrism", waverange_tab)
+
+        with open(waverange_fname, "r") as f:
+            freader = csv.reader(f, delimiter=" ")
+            for row in freader:
+                if row[2] != grism or row[3] != chip_str:
+                    continue
+                if grism == "G800L":
+                    order = acs_order_dict[row[5]]
+                else:
+                    order = int(row[5])
+
+                wavelengthrange.append((order, grism, float(row[6]), float(row[7])))
 
     # array of integers of unique orders
     orders = sorted(set((x[0] for x in wavelengthrange)))
     filters = sorted(set((x[1] for x in wavelengthrange)))
 
-    # Nircam has not specified any limitation on the orders
-    # that should be extracted by default yet so all are
-    # included.
+    # Default list of orders to extract for each grism
     if extract_orders is None:
         extract_orders = [('G102', [1]),
                           ('G141', [1]),
+                          ('G280', [1]),
+                          ('G800L', [1])
                           ]
 
     ref = WavelengthrangeModel()
@@ -87,7 +108,7 @@ def create_tsgrism_wavelengthrange(outname="wfc3_tsgrism_wavelengthrange.asdf",
                             'time': datetime.datetime.utcnow()})
     software = Software({'name': 'wfc3_reftools.py',
                          'author': author,
-                         'homepage': 'https://github.com/spacetelescope/astrogrism_sandbox',
+                         'homepage': 'https://github.com/spacetelescope/astrogrism',
                          'version': '0.0.0'})
     history['software'] = software
     ref.history = [history]
