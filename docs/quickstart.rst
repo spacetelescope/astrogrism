@@ -53,13 +53,3 @@ and is stored in the ``direct_image`` attribute in the same way as the ``grism_i
     GrismObs.grism_image
     >>> [<astropy.io.fits.hdu.image.PrimaryHDU object at 0x7f9240ca8880>,
          <astropy.io.fits.hdu.image.ImageHDU object at 0x7f9201bcfd60>, ...]
-
-Reference files
----------------
-A convenience generator for the reference files is provided in 
-`astrogrism.config.HST.create_reference_files`. Currently, the specws and wavelengthrange
-generators are provided. The distortion generator is currently in progress. To generate
-the files, provide it the GRISMCONF configuration file, and the name of the grism:
-
-    from astrogrism.config.HST import create_reference_files
-    create_reference_files("G102.conf", 'G102')

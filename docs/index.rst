@@ -22,6 +22,13 @@ Using Astrogrism
   quickstart.rst
   transforms.rst
 
+Developer Docs
+==============
+
+.. toctree::
+  :maxdepth:2
+
+  developer.rst
 
 Reference/API
 =============
