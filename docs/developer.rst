@@ -10,7 +10,7 @@ A convenience generator for the reference files is provided in
 reference files based on a GRISMCONF configuration file. The distortion generator 
 is currently in progress. To generate the files, provide the path to the GRISMCONF 
 configuration file and the name of the grism as arguments to the 
-`create_reference_files` function:
+`create_reference_files` function::
 
     from astrogrism.config.HST import create_reference_files
     create_reference_files("G102.conf", 'G102')

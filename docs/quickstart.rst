@@ -11,7 +11,7 @@ class.
 
 To load your data, simply run the following in a Python interpreter or Jupyter
 notebook cell::
-    
+
     from astrogrism import GrismObs
     g_obs = GrismObs("sample_grism_flt.fits")
 
@@ -24,7 +24,7 @@ can call::
 
 For instruments with two chips (WFC3 UVIS and ACS), you must specify the chip for
 which you want the transform, e.g.::
-   
+
     world_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("world", "grism_detector")
 
 This transform would then allow you to calculate the coordinates on the dispered image
