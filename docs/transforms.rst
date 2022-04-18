@@ -64,14 +64,14 @@ example, the following would be valid uses::
     detector_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("detector", "grism_detector")
 
     # Array inputs for spatial (pixel) coordinates
-    d2g([1024, 1030, 1036], [2048.0, 2050, 2052], .7*u.AA, 1.0)
+    detector_to_grism([1024, 1030, 1036], [2048.0, 2050, 2052], .7*u.AA, 1.0)
 
     # Array input for wavelength
-    d2g(1024, 2048.0, [.7, .75, .8]*u.AA, 1.0)
+    detector_to_grism(1024, 2048.0, [.7, .75, .8]*u.AA, 1.0)
 
 However, the following does not currently work::
 
-    d2g([1024, 1030, 1036], [2048.0, 2050, 2052], [.7, .75, .8]*u.AA, 1.0)
+    detector_to_grism([1024, 1030, 1036], [2048.0, 2050, 2052], [.7, .75, .8]*u.AA, 1.0)
 
 Using array inputs for wavelength is currently recommended over using array
 inputs for the spatial coordinates, because the wavelength handling is properly
