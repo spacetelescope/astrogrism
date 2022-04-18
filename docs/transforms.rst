@@ -61,17 +61,21 @@ example, the following would be valid uses::
     from astrogrism import GrismObs
     import astropy.units as u
     g_obs = GrismObs("sample_grism_flt.fits")
-    d2g = g_obs.geometric_transforms["CCD1"].get_transform("detector", "grism_detector")
+    detector_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("detector", "grism_detector")
+
     # Array inputs for spatial (pixel) coordinates
     d2g([1024, 1030, 1036], [2048.0, 2050, 2052], .7*u.AA, 1.0)
+
     # Array input for wavelength
     d2g(1024, 2048.0, [.7, .75, .8]*u.AA, 1.0)
 
 However, the following does not currently work::
 
-    d2g([1024, 1030, 1036], [2048.0, 2050, 2052], [.7, .75, .8], 1.0)
+    d2g([1024, 1030, 1036], [2048.0, 2050, 2052], [.7, .75, .8]*u.AA, 1.0)
 
 Using array inputs for wavelength is currently recommended over using array
 inputs for the spatial coordinates, because the wavelength handling is properly
 vectorized on the backend and has better performance compared to the array
-handling for spatial coordinates.
+handling for spatial coordinates. Using array inputs for spatial coordinates
+currently only gives a factor of 2 increase in performance over looping, rather
+than an order of magnitude or more as might be expected.

@@ -31,16 +31,7 @@ setup_cfg = dict(conf.items('metadata'))
 
 # Configuration for intersphinx: refer to the Python standard library.
 # Uncomment if you cross-ref to API doc from other packages.
-# intersphinx_mapping = {
-#     'python': ('https://docs.python.org/3/',
-#                (None, 'http://data.astropy.org/intersphinx/python3.inv')),
-#     'numpy': ('https://numpy.org/doc/stable/',
-#               (None, 'http://data.astropy.org/intersphinx/numpy.inv')),
-#     'scipy': ('https://docs.scipy.org/doc/scipy/reference/',
-#               (None, 'http://data.astropy.org/intersphinx/scipy.inv')),
-#     'matplotlib': ('https://matplotlib.org/',
-#                    (None, 'http://data.astropy.org/intersphinx/matplotlib.inv')),  # noqa
-#     'astropy': ('https://docs.astropy.org/en/stable/', None)}
+intersphinx_mapping = {'astropy': ('https://docs.astropy.org/en/stable/', None)}
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
