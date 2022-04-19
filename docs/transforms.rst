@@ -73,9 +73,21 @@ However, the following does not currently work::
 
     detector_to_grism([1024, 1030, 1036], [2048.0, 2050, 2052], [.7, .75, .8]*u.um, 1.0)
 
+In the spatial case for array inputs, the example x and y arrays ``[1024, 1030, 1036]``
+and ``[2048.0, 2050, 2052]`` correspond to three points
+``(1024, 2048), (1030, 2050), (1036, 2052)``, rather than a 2D array of points 
+spanning the points in each dimension. You can also specify an array for a single 
+spatial coordinate and a scalar value for the other, for example::
+
+    detector_to_grism([1024, 1030], 2048, 0.7*u.um, 1)
+
+which would calculate the location of flux dispersed from the points 
+``(1024, 2048), (1030, 2048)``.
+
 Using array inputs for wavelength is currently recommended over using array
 inputs for the spatial coordinates, because the wavelength handling is properly
 vectorized on the backend and has better performance compared to the array
 handling for spatial coordinates. Using array inputs for spatial coordinates
-currently only gives a factor of 2 increase in performance over looping, rather
-than an order of magnitude or more as might be expected.
+currently only gives a factor of 2 increase in performance over looping over
+a calculation of single points, rather than an order of magnitude or more as 
+might be expected.
