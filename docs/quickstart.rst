@@ -33,7 +33,7 @@ given a right ascension and declination (currently required to be in degrees), t
 wavelength of interest (specified as a `~astropy.units.Quantity`), and the order 
 of the dispersed spectrum::
 
-    world_to_grism(264.10183, -32.90802, 0.7*u.AA, 1.0)
+    world_to_grism(264.10183, -32.90802, 0.7*u.um, 1.0)
 
 This returns a tuple of values ``(x, y, x0, y0, order)``, where ``(x0, y0)`` denotes 
 coordinates on the direct image, and ``(x, y)`` denotes the dispersed coordinates 
