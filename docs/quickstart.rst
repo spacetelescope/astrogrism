@@ -28,7 +28,7 @@ which you want the transform, e.g.::
 
     world_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("world", "grism_detector")
 
-This transform would then allow you to calculate the coordinates on the dispered image
+This transform would then allow you to calculate the coordinates on the dispersed image
 given a right ascension and declination (currently required to be in degrees), the
 wavelength of interest (specified as a `~astropy.units.Quantity`), and the order 
 of the dispersed spectrum::
