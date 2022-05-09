@@ -10,9 +10,10 @@ observation FITS files and expose the functionality is the ``astrogrism.GrismObs
 class.
 
 To load your data, simply run the following in a Python interpreter or Jupyter
-notebook cell::
-    
+notebook cell, replacing the filename with your file::
+
     from astrogrism import GrismObs
+    import astropy.units as u
     g_obs = GrismObs("sample_grism_flt.fits")
 
 This object makes available the tranforms between the ``world``, ``detector`` 
@@ -24,21 +25,22 @@ can call::
 
 For instruments with two chips (WFC3 UVIS and ACS), you must specify the chip for
 which you want the transform, e.g.::
-   
+
     world_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("world", "grism_detector")
 
-This transform would then allow you to calculate the coordinates on the dispered image
+This transform would then allow you to calculate the coordinates on the dispersed image
 given a right ascension and declination (currently required to be in degrees), the
-wavelength of interest, and the order of the dispersed spectrum::
+wavelength of interest (specified as a `~astropy.units.Quantity`), and the order 
+of the dispersed spectrum::
 
-    world_to_grism(264.10183, -32.90802, 0.7, 1.0)
+    world_to_grism(264.10183, -32.90802, 0.7*u.um, 1.0)
 
 This returns a tuple of values ``(x, y, x0, y0, order)``, where ``(x0, y0)`` denotes 
 coordinates on the direct image, and ``(x, y)`` denotes the dispersed coordinates 
-on the grism image. For more detail about the inputs and outputs of the geometric
-transforms, see :ref:`transforms`.
+on the grism image. For more detail about the available geometric frames and the 
+inputs and outputs of the transforms between them, see :ref:`transforms`.
 
-Note that, in addition to the geometric transforms, the ``GrismObs`` object 
+In addition to the geometric transforms, the ``GrismObs`` object 
 stores the contents of the input FITS file as an ``astropy`` HDUList in the 
 ``grism_image`` attribute. The direct image can also be loaded, e.g::
 
@@ -53,13 +55,3 @@ and is stored in the ``direct_image`` attribute in the same way as the ``grism_i
     GrismObs.grism_image
     >>> [<astropy.io.fits.hdu.image.PrimaryHDU object at 0x7f9240ca8880>,
          <astropy.io.fits.hdu.image.ImageHDU object at 0x7f9201bcfd60>, ...]
-
-Reference files
----------------
-A convenience generator for the reference files is provided in 
-`astrogrism.config.HST.create_reference_files`. Currently, the specws and wavelengthrange
-generators are provided. The distortion generator is currently in progress. To generate
-the files, provide it the GRISMCONF configuration file, and the name of the grism:
-
-    from astrogrism.config.HST import create_reference_files
-    create_reference_files("G102.conf", 'G102')
