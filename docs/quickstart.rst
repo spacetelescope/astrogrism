@@ -16,17 +16,17 @@ notebook cell, replacing the filename with your file::
     import astropy.units as u
     g_obs = GrismObs("sample_grism_flt.fits")
 
-This object makes available the tranforms between the ``world``, ``detector`` 
-(i.e. the undispersed direct image), and ``grism_detector`` frames. To get 
+This object makes available the tranforms between the ``world``, ``direct_frame`` 
+(i.e. the undispersed direct image), and ``grism_frame`` reference frames. To get 
 the transform between, for example, the world and grism detector frames, you 
 can call::
 
-    world_to_grism = g_obs.geometric_transforms.get_transform("world", "grism_detector")
+    world_to_grism = g_obs.geometric_transforms.get_transform("world", "grism_frame")
 
 For instruments with two chips (WFC3 UVIS and ACS), you must specify the chip for
 which you want the transform, e.g.::
 
-    world_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("world", "grism_detector")
+    world_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("world", "grism_frame")
 
 This transform would then allow you to calculate the coordinates on the dispersed image
 given a right ascension and declination (currently required to be in degrees), the
