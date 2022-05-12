@@ -12,19 +12,19 @@ test_dir = pathlib.Path(__file__).parent.absolute()
 def test_acs_g800l_roundtrip():
     """
     Tests Astrogrism transforms round tripping as expected between grism
-    detector, direct detector and world frames.
+    frame, direct frame and world frames.
     """
     test_file = pathlib.Path(test_dir, "data", "acs_test_file.fits")
     grism_obs = GrismObs(str(test_file))
 
-    assert grism_obs.geometric_transforms["CCD1"].available_frames == ['grism_detector',
-                                                                       'detector', 'world']
-    assert grism_obs.geometric_transforms["CCD2"].available_frames == ['grism_detector',
-                                                                       'detector', 'world']
+    assert grism_obs.geometric_transforms["CCD1"].available_frames == ['grism_frame',
+                                                                       'direct_frame', 'world']
+    assert grism_obs.geometric_transforms["CCD2"].available_frames == ['grism_frame',
+                                                                       'direct_frame', 'world']
 
-    # Check that detector -> grism is working before checking full transform
-    d2g1 = grism_obs.geometric_transforms["CCD1"].get_transform("detector", "grism_detector")
-    d2g2 = grism_obs.geometric_transforms["CCD2"].get_transform("detector", "grism_detector")
+    # Check that direct_frame -> grism is working before checking full transform
+    d2g1 = grism_obs.geometric_transforms["CCD1"].get_transform("direct_frame", "grism_frame")
+    d2g2 = grism_obs.geometric_transforms["CCD2"].get_transform("direct_frame", "grism_frame")
 
     d2g1_expected = (1084.130391789169, 2044.4123782198496, 1024.0, 2048.0, 1.0)
     d2g2_expected = (1080.3572828816784, 2045.548766180373, 1024.0, 2048.0, 1.0)
@@ -36,11 +36,11 @@ def test_acs_g800l_roundtrip():
     world_ref1 = (264.0677510637033, -32.91199329438908, 0.7*u.Unit("micron"), 1.0)
     world_ref2 = (264.1018298204877, -32.90801703429679, 0.7*u.Unit("micron"), 1.0)
 
-    g2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("grism_detector", "world")
-    w2g1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "grism_detector")
+    g2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("grism_frame", "world")
+    w2g1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "grism_frame")
 
-    g2w2 = grism_obs.geometric_transforms["CCD2"].get_transform("grism_detector", "world")
-    w2g2 = grism_obs.geometric_transforms["CCD2"].get_transform("world", "grism_detector")
+    g2w2 = grism_obs.geometric_transforms["CCD2"].get_transform("grism_frame", "world")
+    w2g2 = grism_obs.geometric_transforms["CCD2"].get_transform("world", "grism_frame")
 
     w2g1_expected = (2103.325418, 1020.241261, 2047.007260, 1022.979833, 1.0)
     w2g2_expected = (2099.471492, 1020.803474, 2047.001747, 1023.005213, 1.0)
@@ -57,15 +57,15 @@ def test_acs_g800l_roundtrip():
     [assert_quantity_allclose(g2w2_res[i], world_ref2[i], rtol=0.005) for i in
      range(len(world_ref2))]
 
-    # Test world <-> detector transforms
+    # Test world <-> direct_frame transforms
     w2d1_expected = (2047, 1023, 0.7*u.Unit("micron"), 1.0)
     w2d2_expected = (2047, 1023, 0.7*u.Unit("micron"), 1.0)
 
-    d2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("detector", "world")
-    w2d1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "detector")
+    d2w1 = grism_obs.geometric_transforms["CCD1"].get_transform("direct_frame", "world")
+    w2d1 = grism_obs.geometric_transforms["CCD1"].get_transform("world", "direct_frame")
 
-    d2w2 = grism_obs.geometric_transforms["CCD2"].get_transform("detector", "world")
-    w2d2 = grism_obs.geometric_transforms["CCD2"].get_transform("world", "detector")
+    d2w2 = grism_obs.geometric_transforms["CCD2"].get_transform("direct_frame", "world")
+    w2d2 = grism_obs.geometric_transforms["CCD2"].get_transform("world", "direct_frame")
 
     [assert_quantity_allclose(w2d1(*world_ref1)[i], w2d1_expected[i], rtol=5e-5) for
      i in range(len(world_ref1))]

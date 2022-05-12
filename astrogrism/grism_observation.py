@@ -157,7 +157,7 @@ class GrismObs():
             x_offset = 0
             y_offset = 0
 
-        # Build the grism_detector <-> detector transforms
+        # Build the grism_frame <-> direct_frame transforms
         with asdf.open(str(spec_wcs_file)) as f:
             specwcs = f.tree
         displ = specwcs['displ']
@@ -170,7 +170,7 @@ class GrismObs():
         invdispx = specwcs['invdispx']
         orders = specwcs['order']
 
-        gdetector = cf.Frame2D(name='grism_detector',
+        gdetector = cf.Frame2D(name='grism_frame',
                                axes_order=(0, 1),
                                unit=(u.pix, u.pix))
         det2det = AstrogrismForwardGrismDispersion(orders,
@@ -297,7 +297,7 @@ class GrismObs():
 
         imagepipe = []
 
-        det_frame = cf.Frame2D(name="detector")
+        det_frame = cf.Frame2D(name="direct_frame")
         imagepipe.append((det_frame, full_distortion_model))
 
         world_frame = cf.CelestialFrame(name="world", unit=(u.Unit("deg"), u.Unit("deg")),

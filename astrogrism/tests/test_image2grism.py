@@ -21,7 +21,7 @@ testdata = [
 @pytest.mark.parametrize("grism,grism_image", testdata)
 def test_wfc3_grismconf(grism, grism_image):
     """
-    Tests the Astrogrism Detector > Grism Transform against
+    Tests the Astrogrism direct_frame > grism frame transform against
     grismconf's grism transform
     """
     # Download grismconf repo
@@ -81,8 +81,8 @@ def _image2grism(x_center, y_center, wavelengths, grism_file=None):
         raise NotImplementedError("Grism FLT File is required for now")
 
     grismobs = GrismObs(grism_file)
-    image2grism = grismobs.geometric_transforms.get_transform('detector',
-                                                              'grism_detector')
+    image2grism = grismobs.geometric_transforms.get_transform('direct_frame',
+                                                              'grism_frame')
     x, y = list(), list()
     for val in wavelengths:
         print(f"Val: {val}, x_cen: {x_center}, y_cen: {y_center}")
@@ -98,8 +98,8 @@ def _grism2image(x_center, y_center, x_dispersion, y_dispersion, grism_file=None
         raise NotImplementedError("Grism FLT File is required for now")
 
     grismobs = GrismObs(grism_file)
-    grism2image = grismobs.geometric_transforms.get_transform('grism_detector',
-                                                              'detector')
+    grism2image = grismobs.geometric_transforms.get_transform('grism_frame',
+                                                              'direct_frame')
     if len(x_dispersion) != len(y_dispersion):
         raise AttributeError("Non-equal quantities of coordinates provided")
 
