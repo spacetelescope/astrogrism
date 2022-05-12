@@ -17,7 +17,7 @@ testdata = [
 @pytest.mark.parametrize('grism_image', testdata)
 def test_wfc3_astropywcs(grism_image):
     """
-    Tests the Astrogrism Detector > World Transform against
+    Tests the Astrogrism direct frame > world frame transform against
     the built in Astropy WCS model
     """
     # Define Pixel Grid
@@ -35,7 +35,7 @@ def test_wfc3_astropywcs(grism_image):
     # Init GrismObs
     grismobs = GrismObs(grism_image)
     # Retrieve Transform
-    image2world = grismobs.geometric_transforms.get_transform('detector',
+    image2world = grismobs.geometric_transforms.get_transform('direct_frame',
                                                               'world')
     # Calculate sky coordinates on grid
     astrogrism_ra, astrogrism_dec = image2world(xx, yy, 0, 0)[:2]
@@ -46,7 +46,7 @@ def test_wfc3_astropywcs(grism_image):
 
     # Check Roundtripping
     world2image = grismobs.geometric_transforms.get_transform('world',
-                                                              'detector')
+                                                              'direct_frame')
     xx_roundtrip, yy_roundtrip, _, _ = world2image(astrogrism_ra, astrogrism_dec, 0, 0)
     np.testing.assert_allclose(xx, xx_roundtrip, atol=5e-05)
     np.testing.assert_allclose(yy, yy_roundtrip, atol=5e-05)

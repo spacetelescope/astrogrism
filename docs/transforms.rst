@@ -61,7 +61,7 @@ example, the following would be valid uses::
     from astrogrism import GrismObs
     import astropy.units as u
     g_obs = GrismObs("sample_grism_flt.fits")
-    detector_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("detector", "grism_detector")
+    detector_to_grism = g_obs.geometric_transforms["CCD1"].get_transform("direct_frame", "grism_frame")
 
     # Array inputs for spatial (pixel) coordinates
     detector_to_grism([1024, 1030, 1036], [2048.0, 2050, 2052], .7*u.um, 1.0)
